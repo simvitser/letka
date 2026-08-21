@@ -1,6 +1,3 @@
-#include "myassert.h"
-#include <stdio.h>
-#include <string.h>
 #define TESTS
 // #define MYDEBUGARGS
 
