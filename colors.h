@@ -13,5 +13,5 @@
 #define WHITE 37
 #define STANDART 39
 
-void coloredPrintf(uint8_t text_color, char s[]);
+void coloredPrintf(uint8_t text_color, const char *s);
 #endif
