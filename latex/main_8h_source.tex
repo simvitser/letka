@@ -1,0 +1,28 @@
+\doxysection{main.\+h}
+\hypertarget{main_8h_source}{}\label{main_8h_source}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ \_MAIN\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ \_MAIN\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}colors.h"{}}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <assert.h>}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <math.h>}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ EPS\ =\ 0.001;}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}\ \{\ ZERO\_SOLVES,\ ONE\_SOLVES,\ TWO\_SOLVES,\ INF\_SOLVES\ \}\ KSolves;}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00019\ \textcolor{keywordtype}{void}\ clearInputBuffer();}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00027\ \textcolor{keywordtype}{bool}\ getKoefs(\textcolor{keywordtype}{double}\ *a,\ \textcolor{keywordtype}{double}\ *b,\ \textcolor{keywordtype}{double}\ *c);}
+\DoxyCodeLine{00028\ KSolves\ solveLinear(\textcolor{keywordtype}{double}\ k,\ \textcolor{keywordtype}{double}\ b,\ \textcolor{keywordtype}{double}\ *x);}
+\DoxyCodeLine{00029\ KSolves\ solveSquare(\textcolor{keywordtype}{double}\ a,\ \textcolor{keywordtype}{double}\ b,\ \textcolor{keywordtype}{double}\ c,\ \textcolor{keywordtype}{double}\ *x1,\ \textcolor{keywordtype}{double}\ *x2);}
+\DoxyCodeLine{00030\ \textcolor{keywordtype}{void}\ printSolves(KSolves\ n,\ \textcolor{keywordtype}{double}\ x1,\ \textcolor{keywordtype}{double}\ x2);}
+\DoxyCodeLine{00031\ \textcolor{keywordtype}{bool}\ runUnittest(\textcolor{keywordtype}{double}\ a,\ \textcolor{keywordtype}{double}\ b,\ \textcolor{keywordtype}{double}\ c,\ KSolves\ n,\ \textcolor{keywordtype}{double}\ x1,\ \textcolor{keywordtype}{double}\ x2);}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

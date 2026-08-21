@@ -24,12 +24,16 @@
 */
 var NAVTREE =
 [
-  [ "solve_square", "index.html", ]
+  [ "solve_square", "index.html", [
+    [ "Files", "files.html", [
+      [ "File List", "files.html", "files_dup" ]
+    ] ]
+  ] ]
 ];
 
 var NAVTREEINDEX =
 [
-"index.html"
+"colors_8h_source.html"
 ];
 
 const SYNCONMSG = 'click to disable panel synchronization';
