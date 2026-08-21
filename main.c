@@ -189,7 +189,6 @@ void processFlagString(const int argc, char const *const *argv) {
 }
 
 void runUnittestsFromFile(const char *filename) {
-    myassert(1 != 1);
     FILE *file = fopen(filename, "r");
     assert(file != NULL);
     if (file == NULL) {
