@@ -2,6 +2,7 @@
 #define _MAIN_H
 
 #include "colors.h"
+#include "hash.h"
 #include <assert.h>
 #include <curses.h>
 #include <math.h>
@@ -25,9 +26,10 @@
 
 static const double EPS = 0.001;
 #define MAX_ARGS_PER_FLAG 10 // максимальное количество аргументов у флага из командной строки
+#define MAX_LEN 100
 
 typedef enum { ZERO_SOLVES, ONE_SOLVE, TWO_SOLVES, INF_SOLVES } KSolves;
-enum FLAGS_BYTES {FLAGS_QUIET = 0, FLAGS_TYPEENTER, FLAGS_TESTPASSED};
+enum FLAG_BYTES {FLAG_QUIET = 0, FLAG_TYPEENTER, FLAG_TESTFAILED, FLAG_DEBUGARGS, FLAG_DEBUGPARSE, FLAG_SINGUP};
 
 /*!
  * функция для очистки входного буфера
@@ -44,15 +46,15 @@ bool isEqual(double a, double b);
  * @param[in] b - коэффициент
  * @param[in] c - свободный член
  */
-uint8_t parseArgs(int argc, char const *const *argv);
-void processFlagString(const int argc, char const *const *args, uint8_t *flags);
+uint64_t parseArgs(int argc, char const *const *argv);
+void processFlagString(const int argc, char const *const *args, uint64_t *flags);
 bool getKoefsOld(double *a, double *b, double *c);
 bool getKoefsNew(double *a, double *b, double *c);
+bool parseKoefs(char *s, double *a, double *b, double *c);
 bool getKoefs(double *a, double *b, double *c, bool typeenter);
 KSolves solveLinear(double k, double b, double *x);
 KSolves solveSquare(double a, double b, double c, double *x1, double *x2);
 void printSolves(KSolves solution_type, double x1, double x2);
-bool runUnittest(double a, double b, double c, KSolves solution_type, double x1,
-                 double x2);
+bool runUnittest(double a, double b, double c, KSolves solution_type, double x1, double x2);
 
 #endif
