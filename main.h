@@ -12,25 +12,29 @@
 #include <string.h>
 #include <unistd.h>
 
+
+#define quietColoredPrintf(color, smth) if (!GLOBAL_QUIET) coloredPrintf(color, smth)
+#define quietPrintf(smth) if (!GLOBAL_QUIET) printf(smth)
 #define myassert(esp)                                                          \
     if (!(esp)) {                                                              \
         fprintf(stderr, "ASSSSSERT: %s! line: %d, file: %s, func: %s\n", #esp, \
                 __LINE__, __FILE__, __func__);                                 \
         abort();                                                               \
     }
+ 
 
-const double EPS = 0.001;
-const uint8_t MAX_ARGS_PER_FLAG =
-    10; // максимальное количество аргументов у флага из командной строки
+static const double EPS = 0.001;
+#define MAX_ARGS_PER_FLAG 10 // максимальное количество аргументов у флага из командной строки
 
 typedef enum { ZERO_SOLVES, ONE_SOLVE, TWO_SOLVES, INF_SOLVES } KSolves;
+enum FLAGS_BYTES {FLAGS_QUIET = 0, FLAGS_TYPEENTER, FLAGS_TESTPASSED};
 
 /*!
  * функция для очистки входного буфера
  * считывает все символы до \n
  */
 void runUnittests();
-void runUnittestsFromFile(const char *filename);
+bool runUnittestsFromFile(const char *filename);
 void clearInputBuffer();
 bool isZero(double n);
 bool isEqual(double a, double b);
@@ -40,9 +44,11 @@ bool isEqual(double a, double b);
  * @param[in] b - коэффициент
  * @param[in] c - свободный член
  */
-void parseArgs(int argc, char const *const *argv);
-void processFlagString(const int argc, char const *const *args);
-bool getKoefs(double *a, double *b, double *c);
+uint8_t parseArgs(int argc, char const *const *argv);
+void processFlagString(const int argc, char const *const *args, uint8_t *flags);
+bool getKoefsOld(double *a, double *b, double *c);
+bool getKoefsNew(double *a, double *b, double *c);
+bool getKoefs(double *a, double *b, double *c, bool typeenter);
 KSolves solveLinear(double k, double b, double *x);
 KSolves solveSquare(double a, double b, double c, double *x1, double *x2);
 void printSolves(KSolves solution_type, double x1, double x2);

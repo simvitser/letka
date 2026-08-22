@@ -2,22 +2,28 @@
 // #define MYDEBUGARGS
 
 #include "main.h"
-bool QUIET = false;
+bool GLOBAL_QUIET = false;
 
 int main(const int argc, const char *const *argv) {
     runUnittests();
-    parseArgs(argc, argv);
-    if (!QUIET) {
-        puts("This not AI-generated reshalka");
+    uint8_t flags = parseArgs(argc, argv);
+    GLOBAL_QUIET = flags & (1 << FLAGS_QUIET);
+    if (flags & (1 << FLAGS_TESTPASSED)) {
+        return 67;
     }
-
+    if (!GLOBAL_QUIET) {
+        printf("This not AI-generated reshalka\n");
+        coloredPrintf(WHITE, "POL");
+        coloredPrintf(BLUE, "TO");
+        coloredPrintf(RED, "RASHKA\n");
+    }
     double a = NAN, b = NAN, c = NAN;
-    while (!getKoefs(&a, &b, &c)) {
+    while (!getKoefs(&a, &b, &c, flags & (1 << FLAGS_TYPEENTER))) {
         double x1 = NAN, x2 = NAN;
         KSolves solution_type = solveSquare(a, b, c, &x1, &x2);
         printSolves(solution_type, x1, x2);
     }
-    if (!QUIET)
+    if (!GLOBAL_QUIET)
         puts("Bye bye! ;)");
     return 0;
 }
@@ -32,19 +38,51 @@ bool isZero(double n) { return fabs(n) < EPS; }
 
 bool isEqual(double a, double b) { return isZero(a - b); }
 
-bool getKoefs(double *a, double *b, double *c) {
+bool getKoefs(double *a, double *b, double *c, bool typeenter) {
+    if (typeenter) {
+        return getKoefsOld(a, b, c);
+    }
+    return getKoefsNew(a, b, c);
+}
+
+bool getKoefsOld(double *a, double *b, double *c) {
     assert(a != NULL);
     assert(b != NULL);
     assert(c != NULL);
-    if (!QUIET)
-        printf("enter a b c\n>>> ");
+    assert(a != b);
+    assert(b != c);
+    assert(a != c);
+    if (!GLOBAL_QUIET)
+        printf("(old) enter a b c\n>>> ");
     int ch = 0;
     while (scanf("%lg %lg %lg", a, b, c) != 3) {
         while ((ch = getchar()) != '\n') {
             if (ch == 'q' || ch == EOF)
                 return 1;
         }
-        if (!QUIET)
+        if (!GLOBAL_QUIET)
+            printf("NO. enter a b c\n>>> ");
+    }
+    clearInputBuffer();
+    return 0;
+}
+
+bool getKoefsNew(double *a, double *b, double *c) {
+    assert(a != NULL);
+    assert(b != NULL);
+    assert(c != NULL);
+    assert(a != b);
+    assert(b != c);
+    assert(a != c);
+    if (!GLOBAL_QUIET)
+        printf("enter a eq\n>>> ");
+    int ch = 0;
+    while (scanf("%lg %lg %lg", a, b, c) != 3) {
+        while ((ch = getchar()) != '\n') {
+            if (ch == 'q' || ch == EOF)
+                return 1;
+        }
+        if (!GLOBAL_QUIET)
             printf("NO. enter a b c\n>>> ");
     }
     clearInputBuffer();
@@ -70,7 +108,7 @@ KSolves solveSquare(double a, double b, double c, double *x1, double *x2) {
     assert(x1 != x2);
 
     if (!isfinite(a) || !isfinite(b) || !isfinite(c)) {
-        if (!QUIET) {
+        if (!GLOBAL_QUIET) {
             printf("GET ISFINITE\n");
         }
         return ZERO_SOLVES;
@@ -146,12 +184,13 @@ void runUnittests() {
 #endif
 }
 
-void parseArgs(int argc, char const *const *argv) {
+uint8_t parseArgs(int argc, char const *const *argv) {
+    uint8_t flags = 0;
     for (int i = 1; i < argc; i++) {
         if (strncmp("--", argv[i], 2) == 0) {
-            const char *args[MAX_ARGS_PER_FLAG];
+            const char *args[MAX_ARGS_PER_FLAG] = {0};
             int argcc = 1;
-            args[0] = argv[i] + 2;
+            args[0] = argv[i];
             for (int j = i + 1; j < argc; j++) {
                 if (argv[j][0] != '-') {
                     args[argcc] = argv[j];
@@ -160,13 +199,14 @@ void parseArgs(int argc, char const *const *argv) {
                     break;
                 }
             }
-            processFlagString(argcc, args);
+            processFlagString(argcc, args, &flags);
             i += argcc - 1;
         }
     }
+    return flags;
 }
 
-void processFlagString(const int argc, char const *const *argv) {
+void processFlagString(const int argc, char const *const *argv, uint8_t *flags) {
 #ifdef MYDEBUGARGS
     printf("\n\n%s\nargs = %d\nargs = ", argv[0], argc);
     for (int i = 1; i < argc; i++) {
@@ -174,23 +214,26 @@ void processFlagString(const int argc, char const *const *argv) {
     }
     putchar('\n');
 #endif
-    if (!strcmp("quiet", argv[0])) {
-        QUIET = true;
-    } else if (!strcmp("help", argv[0])) {
+    if (!strcmp("--quiet", argv[0])) {
+        *flags |= (1 << FLAGS_QUIET);
+    } else if (!strcmp("--help", argv[0])) {
         puts("mnogo hochech");
-    } else if (!strcmp("testin", argv[0])) {
+    } else if (!strcmp("--oldenter", argv[0])) {
+        *flags |= (1 << FLAGS_TYPEENTER);
+    } else if (!strcmp("--testin", argv[0])) {
         if (argc == 2) {
-            runUnittestsFromFile(argv[1]);
+            if (runUnittestsFromFile(argv[1]))
+                *flags |= (1 << FLAGS_TESTPASSED);
         }
     }
 }
 
-void runUnittestsFromFile(const char *filename) {
+bool runUnittestsFromFile(const char *filename) {
+    assert(filename != NULL);
     FILE *file = fopen(filename, "r");
-    assert(file != NULL);
     if (file == NULL) {
         coloredPrintf(RED, "FILE DON'T EXISTS\n");
-        return;
+        return false;
     }
     double a = NAN, b = NAN, c = NAN, x1 = NAN, x2 = NAN;
     KSolves solution_type = ZERO_SOLVES;
@@ -226,4 +269,5 @@ void runUnittestsFromFile(const char *filename) {
     if (!failed) {
         coloredPrintf(GREEN, "Tests complete!\n");
     }
+    return !failed;
 }
