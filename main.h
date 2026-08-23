@@ -25,7 +25,8 @@
  
 #define MAX_ARGS_PER_FLAG 10 // максимальное количество аргументов у флага из командной строки
 #define MAX_LEN 100
-#define SIZE_PLOT 41
+#define SIZE_PLOT_Y 41
+#define SIZE_PLOT_X 121
 
 typedef enum {
     ZERO_SOLVES,

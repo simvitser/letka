@@ -37,6 +37,9 @@ uint64_t flags = parseArgs(argc, argv);
         double x1 = NAN, x2 = NAN;
         KSolves solution_type = solveSquare(a, b, c, &x1, &x2);
         printSolves(solution_type, x1, x2);
+        if (flags & (1 << FLAG_DRAWPLOT)) {
+            drawPlot(a, b, c);
+        }
     }
     QUIET printf("Bye bye! ;)\n");
     return 0;
@@ -434,24 +437,44 @@ void drawPlot(double a, double b, double c) {
     assert(isfinite(a));
     assert(isfinite(b));
     assert(isfinite(c)); 
-    char plot[SIZE_PLOT][SIZE_PLOT+1] = {};
-    for (int i = 0; i < SIZE_PLOT; i++) {
-        for (int j = 0; j < SIZE_PLOT; j++) {
+    char plot[SIZE_PLOT_Y][SIZE_PLOT_X+1] = {};
+    for (int i = 0; i < SIZE_PLOT_Y; i++) {
+        for (int j = 0; j < SIZE_PLOT_X; j++) {
             plot[i][j] = ' ';
         }
     }
-    for (int i = 0; i < SIZE_PLOT; i++) {
-        plot[i][SIZE_PLOT / 2] = '|';
-        plot[SIZE_PLOT / 2][i] = '-';
+    for (int i = 0; i < SIZE_PLOT_X; i++) {
+        plot[SIZE_PLOT_Y / 2][i] = '-';
     }
-    plot[SIZE_PLOT / 2][SIZE_PLOT / 2] = '+';
-    double y = NAN;
-    for (int i = 0; i < SIZE_PLOT; i++) {
-        y = countEq(a, b, c, i - SIZE_PLOT / 2);
-        if (y < SIZE_PLOT / 2 && y > -SIZE_PLOT / 2) plot[(int)(SIZE_PLOT / 2 - y)][i] = '*';
+    for (int i = 0; i < SIZE_PLOT_Y; i++) {
+        plot[i][SIZE_PLOT_X / 2] = '|';
+    }
+    plot[SIZE_PLOT_Y / 2][SIZE_PLOT_X / 2] = '+';
+
+    double stepx = 0.2, stepy = 0.4, offsetx = 0, offsety = 0;
+    if (isZero(a)) {
+        offsety = -c;
+    } else {
+        offsetx = b / (2 * a);
+        offsety = -countEq(a, b, c, -offsetx);
     }
 
-    for (int i = 0; i < SIZE_PLOT; i++) {
+
+
+
+
+
+
+
+
+
+    double y = NAN;
+    for (int i = 0; i < SIZE_PLOT_X; i++) {
+        y = (countEq(a, b, c, (i - SIZE_PLOT_X / 2) * stepx - offsetx) + offsety) * stepy;
+        if (y < SIZE_PLOT_Y / 2 && y > -SIZE_PLOT_Y / 2) plot[(int)(SIZE_PLOT_Y / 2 - y)][i] = '*';
+    }
+
+    for (int i = 0; i < SIZE_PLOT_Y; i++) {
         printf("%s\n", plot[i]);
     }
 }
