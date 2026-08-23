@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #define EPS 0.001
+#define STATIC_STRLEN(s) (sizeof(s) - 1)
 
 void clearInputBuffer();
 bool isZero(double n);

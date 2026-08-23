@@ -25,6 +25,7 @@
  
 #define MAX_ARGS_PER_FLAG 10 // максимальное количество аргументов у флага из командной строки
 #define MAX_LEN 100
+#define SIZE_PLOT 41
 
 typedef enum {
     ZERO_SOLVES,
@@ -33,6 +34,10 @@ typedef enum {
     INF_SOLVES
 } KSolves;
 
+typedef struct {
+    double a, b, c;
+} SquareKoefs;
+
 enum FLAG_BYTES {
     FLAG_QUIET = 0, 
     FLAG_TYPEENTER, 
@@ -40,7 +45,8 @@ enum FLAG_BYTES {
     FLAG_DEBUGARGS, 
     FLAG_DEBUGPARSE, 
     FLAG_SIGNUP, 
-    FLAG_RANDOMTESTFAILED
+    FLAG_RANDOMTESTFAILED,
+    FLAG_DRAWPLOT
 };
 
 enum MAINERRORS {
@@ -73,5 +79,6 @@ void printSolves(KSolves solution_type, double x1, double x2);
 bool runUnittest(double a, double b, double c, KSolves solution_type, double x1, double x2);
 double countEq(double a, double b, double c, double x);
 bool runRandomUnittest(long num_tests);
+void drawPlot(double a, double b, double c);
 
 #endif

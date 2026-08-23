@@ -113,11 +113,11 @@ bool parseKoefs(char *s, double *a, double *b, double *c) {
     MYDEBUGPARSE printf("get: %s\n\n", s);
     double a_temp = 0, b_temp = 0, c_temp = 0, temp = 0;
     int8_t sign = 1;
-    char square_plus[] = "x^2+";
-    char x_plus[] = "x+";
-    char plus[] = "+";
-    char minus_x_plus[] = "-x+";
-    char minus_square_plus[] = "-x^2+";
+    static const char square_plus[] = "x^2+";
+    static const char x_plus[] = "x+";
+    static const char plus[] = "+";
+    static const char minus_x_plus[] = "-x+";
+    static const char minus_square_plus[] = "-x^2+";
     do {
         char *temp_s;
         temp = strtod(s, &temp_s);
@@ -126,21 +126,21 @@ bool parseKoefs(char *s, double *a, double *b, double *c) {
         }
         s = temp_s;
         MYDEBUGPARSE printf("s: %s, temp: %lg, mn: %d, a b c: %lg %lg %lg\n", s, temp, sign, a_temp, b_temp, c_temp);
-        if (!strncmp(s, square_plus, sizeof square_plus - 1)) {
+        if (!strncmp(s, square_plus, STATIC_STRLEN(square_plus))) {
             a_temp += temp * sign;
-            s += sizeof square_plus - 1;
-        } else if (!strncmp(s, x_plus, sizeof x_plus - 1)) {
+            s += STATIC_STRLEN(square_plus);
+        } else if (!strncmp(s, x_plus, STATIC_STRLEN(x_plus))) {
             b_temp += temp * sign;
-            s += sizeof x_plus - 1;
-        } else if (!strncmp(s, plus, sizeof plus - 1)) {
+            s += STATIC_STRLEN(x_plus);
+        } else if (!strncmp(s, plus, STATIC_STRLEN(plus))) {
             c_temp += temp * sign;
-            s += sizeof plus - 1;
-        } else if (!strncmp(s, minus_x_plus, sizeof minus_x_plus - 1)) {
+            s += STATIC_STRLEN(plus);
+        } else if (!strncmp(s, minus_x_plus, STATIC_STRLEN(minus_x_plus))) {
             b_temp -= temp * sign;
-            s += sizeof minus_x_plus - 1;
-        } else if (!strncmp(s, minus_square_plus, sizeof minus_square_plus - 1)) {
+            s += STATIC_STRLEN(minus_x_plus);
+        } else if (!strncmp(s, minus_square_plus, STATIC_STRLEN(minus_square_plus))) {
             a_temp -= temp * sign;
-            s += sizeof minus_square_plus - 1;
+            s += STATIC_STRLEN(minus_square_plus);
         } else if (s[0] != '\0') {
             MYDEBUGPARSE printf("s: %s, a b c: %lg %lg %lg\n", s, *a, *b, *c);
             return 1;
@@ -298,6 +298,8 @@ void processFlagString(const int argc, char const *const *argv, uint64_t *flags)
         }
     } else if (!strcmp("--debugargs", argv[0])) {
         *flags |= (1 << FLAG_DEBUGARGS);
+    } else if (!strcmp("--drawplot", argv[0])) {
+        *flags |= (1 << FLAG_DRAWPLOT);
     } else if (!strcmp("--debugparse", argv[0])) {
         *flags |= (1 << FLAG_DEBUGPARSE);
     } else if (!strcmp("--signup", argv[0])) {
@@ -307,6 +309,10 @@ void processFlagString(const int argc, char const *const *argv, uint64_t *flags)
             if (!runRandomUnittest(strtol(argv[1], NULL, 10))) {
                 *flags |= (1 << FLAG_RANDOMTESTFAILED);
             }
+        }
+    } else if (!strcmp("--seed", argv[0])) {
+        if (argc == 2) {
+            srand((uint32_t)strtol(argv[1], NULL, 10));
         }
     }
 }
@@ -355,7 +361,6 @@ bool runUnittestsFromFile(const char *filename) {
     return !failed;
 }
 
-//TODO: random seed
 bool runRandomUnittest(long num_tests) {
     double a = NAN, b = NAN, c = NAN, x1 = NAN, x2 = NAN;
     KSolves solution_type = ZERO_SOLVES, solution_type_ref = ZERO_SOLVES;
@@ -423,4 +428,30 @@ bool runRandomUnittest(long num_tests) {
 
 double countEq(double a, double b, double c, double x) {
     return a * x * x + b * x + c;
+}
+
+void drawPlot(double a, double b, double c) {
+    assert(isfinite(a));
+    assert(isfinite(b));
+    assert(isfinite(c)); 
+    char plot[SIZE_PLOT][SIZE_PLOT+1] = {};
+    for (int i = 0; i < SIZE_PLOT; i++) {
+        for (int j = 0; j < SIZE_PLOT; j++) {
+            plot[i][j] = ' ';
+        }
+    }
+    for (int i = 0; i < SIZE_PLOT; i++) {
+        plot[i][SIZE_PLOT / 2] = '|';
+        plot[SIZE_PLOT / 2][i] = '-';
+    }
+    plot[SIZE_PLOT / 2][SIZE_PLOT / 2] = '+';
+    double y = NAN;
+    for (int i = 0; i < SIZE_PLOT; i++) {
+        y = countEq(a, b, c, i - SIZE_PLOT / 2);
+        if (y < SIZE_PLOT / 2 && y > -SIZE_PLOT / 2) plot[(int)(SIZE_PLOT / 2 - y)][i] = '*';
+    }
+
+    for (int i = 0; i < SIZE_PLOT; i++) {
+        printf("%s\n", plot[i]);
+    }
 }
