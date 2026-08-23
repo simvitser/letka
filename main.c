@@ -459,15 +459,6 @@ void drawPlot(double a, double b, double c) {
         offsety = -countEq(a, b, c, -offsetx);
     }
 
-
-
-
-
-
-
-
-
-
     double y = NAN;
     for (int i = 0; i < SIZE_PLOT_X; i++) {
         y = (countEq(a, b, c, (i - SIZE_PLOT_X / 2) * stepx - offsetx) + offsety) * stepy;
