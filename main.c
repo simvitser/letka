@@ -39,6 +39,8 @@ uint64_t flags = parseArgs(argc, argv);
         printSolves(solution_type, x1, x2);
         if (flags & (1 << FLAG_DRAWPLOT)) {
             drawPlot(a, b, c);
+        } else if (flags & (1 << FLAG_DRAWPLOTOFFSET)) {
+            drawPlotOffset(a, b, c);
         }
     }
     QUIET printf("Bye bye! ;)\n");
@@ -291,7 +293,17 @@ void processFlagString(const int argc, char const *const *argv, uint64_t *flags)
     if (!strcmp("--quiet", argv[0])) {
         *flags |= (1 << FLAG_QUIET);
     } else if (!strcmp("--help", argv[0])) {
-        puts("mnogo hochech");
+        printf("Usage:\n"
+               "--quiet                     disable dialog outputs\n"
+               "--oldenter                  enable old enter (a b c)\n"
+               "--testin [file.txt]         unittests from file\n"
+               "--debugargs                 debug argparse\n"
+               "--debugparse                debug parsing eq\n"
+               "--drawplot                  draw a plot\n"
+               "--drawplotoffset            draw a plot by offsets\n"
+               "--signup                    register a user\n"
+               "--randtest [num_tests]      generate random tests\n"
+               "--seed [seed]               set seed\n");
     } else if (!strcmp("--oldenter", argv[0])) {
         *flags |= (1 << FLAG_TYPEENTER);
     } else if (!strcmp("--testin", argv[0])) {
@@ -301,10 +313,12 @@ void processFlagString(const int argc, char const *const *argv, uint64_t *flags)
         }
     } else if (!strcmp("--debugargs", argv[0])) {
         *flags |= (1 << FLAG_DEBUGARGS);
-    } else if (!strcmp("--drawplot", argv[0])) {
-        *flags |= (1 << FLAG_DRAWPLOT);
     } else if (!strcmp("--debugparse", argv[0])) {
         *flags |= (1 << FLAG_DEBUGPARSE);
+    } else if (!strcmp("--drawplot", argv[0])) {
+        *flags |= (1 << FLAG_DRAWPLOT);
+    } else if (!strcmp("--drawplotoffset", argv[0])) {
+        *flags |= (1 << FLAG_DRAWPLOTOFFSET);
     } else if (!strcmp("--signup", argv[0])) {
         *flags |= (1 << FLAG_SIGNUP);
     } else if (!strcmp("--randtest", argv[0])) {
@@ -433,7 +447,7 @@ double countEq(double a, double b, double c, double x) {
     return a * x * x + b * x + c;
 }
 
-void drawPlot(double a, double b, double c) {
+void drawPlotOffset(double a, double b, double c) {
     assert(isfinite(a));
     assert(isfinite(b));
     assert(isfinite(c)); 
@@ -462,6 +476,51 @@ void drawPlot(double a, double b, double c) {
     double y = NAN;
     for (int i = 0; i < SIZE_PLOT_X; i++) {
         y = (countEq(a, b, c, (i - SIZE_PLOT_X / 2) * stepx - offsetx) + offsety) * stepy;
+        if (y < SIZE_PLOT_Y / 2 && y > -SIZE_PLOT_Y / 2) plot[(int)(SIZE_PLOT_Y / 2 - y)][i] = '*';
+    }
+
+    for (int i = 0; i < SIZE_PLOT_Y; i++) {
+        printf("%s\n", plot[i]);
+    }
+}
+
+void drawPlot(double a, double b, double c) {
+    assert(isfinite(a));
+    assert(isfinite(b));
+    assert(isfinite(c)); 
+    char plot[SIZE_PLOT_Y][SIZE_PLOT_X+1] = {};
+    for (int i = 0; i < SIZE_PLOT_Y; i++) {
+        for (int j = 0; j < SIZE_PLOT_X; j++) {
+            plot[i][j] = ' ';
+        }
+    }
+    for (int i = 0; i < SIZE_PLOT_X; i++) {
+        plot[SIZE_PLOT_Y / 2][i] = '-';
+    }
+    for (int i = 0; i < SIZE_PLOT_Y; i++) {
+        plot[i][SIZE_PLOT_X / 2] = '|';
+    }
+    plot[SIZE_PLOT_Y / 2][SIZE_PLOT_X / 2] = '+';
+
+    double stepx = 0.1, stepy = 0.2;
+    if (isZero(a)) {
+        if (fabs(c) * stepy > SIZE_PLOT_Y / 4 * 3) {
+            double scale = SIZE_PLOT_Y / 4 * 3 / c;
+            stepx *= scale;
+            stepy *= scale;
+        }
+    } else {
+        double x0 = -b / (2 * a);
+        double y0 = countEq(a, b, c, x0);
+        while (fabs(x0) * stepx > SIZE_PLOT_X / 4 || fabs(y0) * stepy > SIZE_PLOT_Y / 4) {
+            stepx /= 2;
+            stepy /= 2;
+        } 
+    }
+
+    double y = NAN;
+    for (int i = 0; i < SIZE_PLOT_X; i++) {
+        y = countEq(a, b, c, (i - SIZE_PLOT_X / 2) * stepx) * stepy;
         if (y < SIZE_PLOT_Y / 2 && y > -SIZE_PLOT_Y / 2) plot[(int)(SIZE_PLOT_Y / 2 - y)][i] = '*';
     }
 

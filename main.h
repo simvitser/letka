@@ -47,7 +47,8 @@ enum FLAG_BYTES {
     FLAG_DEBUGPARSE, 
     FLAG_SIGNUP, 
     FLAG_RANDOMTESTFAILED,
-    FLAG_DRAWPLOT
+    FLAG_DRAWPLOT,
+    FLAG_DRAWPLOTOFFSET
 };
 
 enum MAINERRORS {
@@ -81,5 +82,6 @@ bool runUnittest(double a, double b, double c, KSolves solution_type, double x1,
 double countEq(double a, double b, double c, double x);
 bool runRandomUnittest(long num_tests);
 void drawPlot(double a, double b, double c);
+void drawPlotOffset(double a, double b, double c);
 
 #endif
