@@ -5,7 +5,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-#define EPS 0.001
+#define EPS 1e-9
 #define STATIC_STRLEN(s) (sizeof(s) - 1)
 
 void clearInputBuffer();

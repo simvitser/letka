@@ -251,9 +251,7 @@ void runUnittests() {
     assert(runUnittest(0, 0, 0, INF_SOLVES, 0, 0));
     assert(runUnittest(4, 5, 6, ZERO_SOLVES, 0, 0));
     assert(runUnittest(1, 2, 1, ONE_SOLVE, -1, 0));
-    assert(runUnittest(1, 3, 1, TWO_SOLVES, -2.61803, -0.381966));
-    assert(runUnittest(34, 444, 34, TWO_SOLVES, -12.9818, -0.077031));
-    assert(runUnittest(7, 878, 7, TWO_SOLVES, -125.421, -0.00797317));
+    assert(runUnittest(2, -24, 64, TWO_SOLVES, 4, 8));
 #endif
 }
 
@@ -302,7 +300,7 @@ void processFlagString(const int argc, char const *const *argv, uint64_t *flags)
                "--drawplot                  draw a plot\n"
                "--drawplotoffset            draw a plot by offsets\n"
                "--signup                    register a user\n"
-               "--randtest [num_tests]      generate random tests\n"
+               "--randtests [num_tests]      generate random tests\n"
                "--seed [seed]               set seed\n");
     } else if (!strcmp("--oldenter", argv[0])) {
         *flags |= (1 << FLAG_TYPEENTER);
@@ -321,7 +319,7 @@ void processFlagString(const int argc, char const *const *argv, uint64_t *flags)
         *flags |= (1 << FLAG_DRAWPLOTOFFSET);
     } else if (!strcmp("--signup", argv[0])) {
         *flags |= (1 << FLAG_SIGNUP);
-    } else if (!strcmp("--randtest", argv[0])) {
+    } else if (!strcmp("--randtests", argv[0])) {
         if (argc == 2) {
             if (!runRandomUnittest(strtol(argv[1], NULL, 10))) {
                 *flags |= (1 << FLAG_RANDOMTESTFAILED);
@@ -379,7 +377,7 @@ bool runUnittestsFromFile(const char *filename) {
 }
 
 bool runRandomUnittest(long num_tests) {
-    double a = NAN, b = NAN, c = NAN, x1 = NAN, x2 = NAN;
+    double a = NAN, b = NAN, c = NAN, x1 = NAN, x2 = NAN, x1_ref = NAN, x2_ref = NAN;
     KSolves solution_type = ZERO_SOLVES, solution_type_ref = ZERO_SOLVES;
     double x0 = NAN, y0 = NAN;
     for (int i = 0; i < num_tests; i++) {
@@ -438,6 +436,23 @@ bool runRandomUnittest(long num_tests) {
                 return false;
             }   
         }
+    }
+    for (int i = 0; i < num_tests; i++) {
+        x1_ref = randDouble();
+        x2_ref = randDouble();
+        if (x1_ref > x2_ref) {
+            double temp = x1_ref;
+            x1_ref = x2_ref;
+            x2_ref = temp;
+        }
+        a = randDouble();
+        b = -a * (x1_ref + x2_ref);
+        c = x1_ref * x2_ref * a;
+        solution_type = solveSquare(a, b, c, &x1, &x2);
+        if (solution_type != TWO_SOLVES || !isEqual(x1, x1_ref) || !isEqual(x2, x2_ref)) {
+            QUIET printf("FAILED solve: a b c: %lg %lg %lg x1: %lg x2: %lg x1_ref: %lg x2_ref: %lg\n", a, b, c, x1, x2, x1_ref, x2_ref);
+            return false;
+        }   
     }
     QUIET printf("TEST PASSED\n");
     return true;
