@@ -7,8 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "colors.h"
-
-extern bool GLOBAL_QUIET;
+#include "common.h"
 
 #define MAX_LEN_LOGIN 20
 #define MAX_LEN_PASSWORD 30

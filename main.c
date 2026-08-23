@@ -1,6 +1,6 @@
 #define TESTS
-#define MYDEBUGARGS if(GLOBAL_DEBUG_PARSE)
-#define MYDEBUGPARSE if(GLOBAL_DEBUG_PARSE)
+#define MYDEBUGARGS if (GLOBAL_DEBUG_PARSE)
+#define MYDEBUGPARSE if (GLOBAL_DEBUG_PARSE)
 
 #include "main.h"
 bool GLOBAL_QUIET = false;
@@ -15,41 +15,37 @@ int main(const int argc, const char *const *argv) {
     GLOBAL_DEBUG_ARGS = flags & (1 << FLAG_DEBUGARGS);
     GLOBAL_DEBUG_PARSE = flags & (1 << FLAG_DEBUGPARSE);
     if (flags & (1 << FLAG_TESTFAILED)) {
-        return 67;
+        return MAINERRORS_FAILEDTESTS;
+    }
+    if (flags & (1 << FLAG_RANDOMTESTFAILED)) {
+        return MAINERRORS_FAILEDRANDOMTEST;
     }
     if (flags & (1 << FLAG_SINGUP)) {
         singup();
         return 0;
     }
-    if (!GLOBAL_QUIET) {
+    QUIET {
         printf("This not AI-generated reshalka\n");
         coloredPrintf(WHITE, "POL");
         coloredPrintf(BLUE, "TO");
         coloredPrintf(RED, "RASHKA\n");
     }
-    if (!singin()) return 0;
+    if (!singin())
+        return 0;
     double a = NAN, b = NAN, c = NAN;
     while (!getKoefs(&a, &b, &c, flags & (1 << FLAG_TYPEENTER))) {
         double x1 = NAN, x2 = NAN;
         KSolves solution_type = solveSquare(a, b, c, &x1, &x2);
         printSolves(solution_type, x1, x2);
     }
-    if (!GLOBAL_QUIET)
-        puts("Bye bye! ;)");
+    QUIET printf("Bye bye! ;)\n");
     return 0;
 }
 
-void clearInputBuffer() {
-    int ch = '\0';
-    while ((ch = getchar()) != '\n' && ch != EOF)
-        ;
-}
-
-bool isZero(double n) { return fabs(n) < EPS; }
-
-bool isEqual(double a, double b) { return isZero(a - b); }
-
 bool getKoefs(double *a, double *b, double *c, bool typeenter) {
+    assert(a != NULL);
+    assert(b != NULL);
+    assert(c != NULL);
     if (typeenter) {
         return getKoefsOld(a, b, c);
     }
@@ -63,16 +59,14 @@ bool getKoefsOld(double *a, double *b, double *c) {
     assert(a != b);
     assert(b != c);
     assert(a != c);
-    if (!GLOBAL_QUIET)
-        printf("(old) enter a b c\n>>> ");
+    QUIET printf("(old) enter a b c\n>>> ");
     int ch = 0;
     while (scanf("%lg %lg %lg", a, b, c) != 3) {
         while ((ch = getchar()) != '\n') {
             if (ch == 'q' || ch == EOF)
                 return 1;
         }
-        if (!GLOBAL_QUIET)
-            printf("NO. enter a b c\n>>> ");
+        QUIET printf("NO. enter a b c\n>>> ");
     }
     clearInputBuffer();
     return 0;
@@ -84,18 +78,19 @@ bool getKoefsNew(double *a, double *b, double *c) {
     assert(c != NULL);
     assert(a != b);
     assert(b != c);
-    assert(a != c); 
+    assert(a != c);
     char s_input[MAX_LEN] = {0};
     char s[MAX_LEN * 2] = {0};
+    int j = 1;
     do {
-        if (!GLOBAL_QUIET)
-            printf("enter a eq\n>>> ");
+        QUIET printf("enter a eq\n>>> ");
         fgets(s_input, MAX_LEN, stdin);
-        if (strchr(s_input, 'q') != NULL) return 1;
-        int j = 0;
+        if (strchr(s_input, 'q') != NULL)
+            return true;
+        j = 0;
         for (int i = 0; s_input[i] != '\0'; i++) {
             if (s_input[i] != ' ' && s_input[i] != '\n') {
-                if (s_input[i] == '-' || s_input[i] == '=') { 
+                if (s_input[i] == '-' || s_input[i] == '=') {
                     s[j] = '+';
                     j++;
                 }
@@ -104,23 +99,29 @@ bool getKoefsNew(double *a, double *b, double *c) {
             }
         }
         s[j] = '+';
-    } while (parseKoefs(s, a, b, c));
+    } while (j == 0 || parseKoefs(s, a, b, c) ||
+             !(isfinite(*a) && isfinite(*b) && isfinite(*c)));
     printf("START SOLVING...\n");
-    return 0;
+    return false;
 }
 
 bool parseKoefs(char *s, double *a, double *b, double *c) {
+    assert(s != NULL);
+    assert(a != NULL);
+    assert(b != NULL);
+    assert(c != NULL);
     MYDEBUGPARSE printf("get: %s\n\n", s);
     double a_temp = 0, b_temp = 0, c_temp = 0, temp = 0;
     int8_t mn = 1;
     do {
-        char* temp_s;
+        char *temp_s;
         temp = strtod(s, &temp_s);
         if (s == temp_s) {
             temp = 1;
         }
         s = temp_s;
-        MYDEBUGPARSE printf("s: %s, temp: %lg, mn: %d\n", s, temp, mn);
+        MYDEBUGPARSE printf("s: %s, temp: %lg, mn: %d, a b c: %lg %lg %lg\n", s,
+                            temp, mn, a_temp, b_temp, c_temp);
         if (!strncmp(s, "x^2+", 4)) {
             a_temp += temp * mn;
             s += 4;
@@ -130,14 +131,23 @@ bool parseKoefs(char *s, double *a, double *b, double *c) {
         } else if (!strncmp(s, "+", 1)) {
             c_temp += temp * mn;
             s++;
-        } else { 
-            MYDEBUGPARSE printf("a b c: %lg %lg %lg\n", *a, *b, *c);
+        } else if (!strncmp(s, "-x+", 3)) {
+            b_temp -= temp * mn;
+            s += 3;
+        } else if (!strncmp(s, "-x^2+", 5)) {
+            a_temp -= temp * mn;
+            s += 5;
+        } else if (s[0] != '\0') {
+            MYDEBUGPARSE printf("s: %s, a b c: %lg %lg %lg\n", s, *a, *b, *c);
             return 1;
         }
         if (*s == '=') {
-            if (mn < 0) return 1;
+            if (mn < 0)
+                return 1;
             s++;
             mn *= -1;
+            if (*s == '+')
+                s++;
         }
     } while (*s != '\0');
     *a = a_temp;
@@ -148,6 +158,9 @@ bool parseKoefs(char *s, double *a, double *b, double *c) {
 }
 
 KSolves solveLinear(double k, double b, double *x) {
+    assert(isfinite(k));
+    assert(isfinite(b));
+    assert(x != NULL);
     if (isZero(k)) {
         if (isZero(b))
             return INF_SOLVES;
@@ -164,13 +177,6 @@ KSolves solveSquare(double a, double b, double c, double *x1, double *x2) {
     assert(x1 != NULL);
     assert(x2 != NULL);
     assert(x1 != x2);
-
-    if (!isfinite(a) || !isfinite(b) || !isfinite(c)) {
-        if (!GLOBAL_QUIET) {
-            printf("GET ISFINITE\n");
-        }
-        return ZERO_SOLVES;
-    }
 
     if (isZero(a)) {
         return solveLinear(b, c, x1);
@@ -210,8 +216,7 @@ void printSolves(KSolves solution_type, double x1, double x2) {
     }
 }
 
-bool runUnittest(double a, double b, double c, KSolves solution_type, double x1,
-                 double x2) {
+bool runUnittest(double a, double b, double c, KSolves solution_type, double x1, double x2) {
     double x1_test = NAN, x2_test = NAN;
     KSolves solution_type_test = solveSquare(a, b, c, &x1_test, &x2_test);
     if (solution_type != solution_type_test) {
@@ -223,7 +228,8 @@ bool runUnittest(double a, double b, double c, KSolves solution_type, double x1,
     case ONE_SOLVE:
         return isEqual(x1, x1_test);
     case TWO_SOLVES:
-        return isEqual(x1, x1_test) && isEqual(x2, x2_test);
+        return (isEqual(x1, x1_test) && isEqual(x2, x2_test)) ||
+               (isEqual(x2, x1_test) && isEqual(x1, x2_test));
     case INF_SOLVES:
         return true;
     default:
@@ -243,6 +249,7 @@ void runUnittests() {
 }
 
 uint64_t parseArgs(int argc, char const *const *argv) {
+    assert(argv != NULL);
     uint64_t flags = 0;
     for (int i = 1; i < argc; i++) {
         if (strncmp("--", argv[i], 2) == 0) {
@@ -264,7 +271,10 @@ uint64_t parseArgs(int argc, char const *const *argv) {
     return flags;
 }
 
-void processFlagString(const int argc, char const *const *argv, uint64_t *flags) {
+void processFlagString(const int argc, char const *const *argv,
+                       uint64_t *flags) {
+    assert(argv != NULL);
+    assert(flags != NULL);
     MYDEBUGARGS {
         printf("\n\n%s\nargs = %d\nargs = ", argv[0], argc);
         for (int i = 1; i < argc; i++) {
@@ -289,6 +299,12 @@ void processFlagString(const int argc, char const *const *argv, uint64_t *flags)
         *flags |= (1 << FLAG_DEBUGPARSE);
     } else if (!strcmp("--singup", argv[0])) {
         *flags |= (1 << FLAG_SINGUP);
+    } else if (!strcmp("--randtest", argv[0])) {
+        if (argc == 2) {
+            if (!runRandomUnittest(strtol(argv[1], NULL, 10))) {
+                *flags |= (1 << FLAG_RANDOMTESTFAILED);
+            }
+        }
     }
 }
 
@@ -336,3 +352,71 @@ bool runUnittestsFromFile(const char *filename) {
     return !failed;
 }
 
+bool runRandomUnittest(long num_tests) {
+    double a = NAN, b = NAN, c = NAN, x1 = NAN, x2 = NAN;
+    KSolves solution_type = ZERO_SOLVES, solution_type_ref = ZERO_SOLVES;
+    double x0 = NAN, y0 = NAN;
+    for (int i = 0; i < num_tests; i++) {
+        a = (double)rand() / rand();
+        b = (double)rand() / rand();
+        c = (double)rand() / rand();
+        if (!isZero(a)) {
+            x0 = -b / (2 * a);
+            y0 = countEq(a, b, c, x0);
+            if (y0 < -EPS) {
+                solution_type_ref = TWO_SOLVES;
+            } else if (y0 < EPS) {
+                solution_type_ref = ONE_SOLVE;
+            } else {
+                solution_type_ref = ZERO_SOLVES;
+            }
+            solution_type = solveSquare(a, b, c, &x1, &x2);
+            if (solution_type != solution_type_ref) {
+                QUIET printf("FAILED solution_type: a b c: %lg %lg %lg\n", a, b, c);
+                return false;
+            }
+            switch (solution_type) {
+            case ZERO_SOLVES:
+                break;
+            case ONE_SOLVE:
+                if (!isZero(countEq(a, b, c, x1))) {
+                    QUIET printf("FAILED solve: a b c x: %lg %lg %lg %lg\n", a, b, c, x1);
+                    return false;
+                }
+                break;
+            case TWO_SOLVES:
+                if (!isZero(countEq(a, b, c, x1)) || !isZero(countEq(a, b, c, x2))) {
+                    QUIET printf("FAILED solve: a b c x1 x2: %lg %lg %lg %lg %lg\n", a, b, c, x1, x2);
+                    return false;
+                }
+                break;
+            case INF_SOLVES:
+            default:
+                assert(false);
+            }
+        }
+    }
+    a = 0;
+    for (int i = 0; i < num_tests; i++) {
+        b = (double)rand() / rand();
+        c = (double)rand() / rand();
+        if (!isZero(b)) {
+            solution_type_ref = ONE_SOLVE;
+            solution_type = solveSquare(a, b, c, &x1, &x2);
+            if (solution_type != solution_type_ref) {
+                QUIET printf("FAILED solution_type: a b c: %lg %lg %lg\n", a, b, c);
+                return false;
+            }
+            if (!isZero(countEq(a, b, c, x1))) {
+                QUIET printf("FAILED solve: a b c x: %lg %lg %lg %lg\n", a, b, c, x1);
+                return false;
+            }   
+        }
+    }
+    QUIET printf("TEST PASSED\n");
+    return true;
+}
+
+double countEq(double a, double b, double c, double x) {
+    return a * x * x + b * x + c;
+}
