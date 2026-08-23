@@ -10,3 +10,4 @@ bool isZero(double n) { return fabs(n) < EPS; }
 
 bool isEqual(double a, double b) { return isZero(a - b); }
 
+double randDouble() { return (double)rand() / (rand() + 1); }

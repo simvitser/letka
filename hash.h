@@ -15,7 +15,7 @@
 uint64_t hash1(const char* s);
 uint64_t hash2(const char* s);
 
-void singup();
-bool singin();
+void signup();
+bool signin();
 
 #endif

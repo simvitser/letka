@@ -1,3 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-int main() { fprintf(stdout, "MOEW"); }
+int main() {
+  printf("%d\n", sizeof "123");
+}

@@ -24,9 +24,7 @@ uint64_t hash2(const char *s) {
     return ans;
 }
 
-
-//TODO: добавить проверку: пароль уже использует Вася пупкин
-void singup() {
+void signup() {
     char login[MAX_LEN_LOGIN] = {0};
     char password1[MAX_LEN_PASSWORD] = {0};
     char password2[MAX_LEN_PASSWORD] = {0};
@@ -44,7 +42,11 @@ void singup() {
     uint64_t h2 = hash2(password1);
 
     char login_temp[MAX_LEN_LOGIN] = {0};
-    FILE *file = fopen("baza.txt", "r");
+    FILE *file = fopen("baza.txt", "a+");
+    if (file == NULL) {
+        perror("Something went wrong, please, try later");
+        return;
+    }
     uint64_t h1_temp = 0;
     uint64_t h2_temp = 0;
     while (fscanf(file, "%s %lu %lu", login_temp, &h1_temp, &h2_temp) == 3) { 
@@ -57,16 +59,12 @@ void singup() {
             return;
         }
     }
-    file = fopen("baza.txt", "a");
-    if (file == NULL) {
-        printf("Something went wrong, please, try later (file doesn't exist)\n");
-        return;
-    } 
     fprintf(file, "%s %lu %lu\n", login, h1, h2);
     printf("registred!\n");
+    fclose(file);
 }
 
-bool singin() {
+bool signin() {
     char login[MAX_LEN_LOGIN] = {0};
     char password[MAX_LEN_PASSWORD] = {0};
     char login_temp[MAX_LEN_LOGIN] = {0};
@@ -82,7 +80,7 @@ bool singin() {
     uint64_t h2_temp = 0;
     FILE *file = fopen("baza.txt", "r");
     if (file == NULL) {
-        printf("Something went wrong, please, try later (file doesn't exist)\n");
+        perror("Something went wrong, please, try later");
         return false;
     }
     while (fscanf(file, "%s %lu %lu", login_temp, &h1_temp, &h2_temp) == 3) { 

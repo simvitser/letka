@@ -10,7 +10,7 @@ bool GLOBAL_DEBUG_PARSE = false;
 
 int main(const int argc, const char *const *argv) {
     runUnittests();
-    uint64_t flags = parseArgs(argc, argv);
+uint64_t flags = parseArgs(argc, argv);
     GLOBAL_QUIET = flags & (1 << FLAG_QUIET);
     GLOBAL_DEBUG_ARGS = flags & (1 << FLAG_DEBUGARGS);
     GLOBAL_DEBUG_PARSE = flags & (1 << FLAG_DEBUGPARSE);
@@ -20,8 +20,8 @@ int main(const int argc, const char *const *argv) {
     if (flags & (1 << FLAG_RANDOMTESTFAILED)) {
         return MAINERRORS_FAILEDRANDOMTEST;
     }
-    if (flags & (1 << FLAG_SINGUP)) {
-        singup();
+    if (flags & (1 << FLAG_SIGNUP)) {
+        signup();
         return 0;
     }
     QUIET {
@@ -30,7 +30,7 @@ int main(const int argc, const char *const *argv) {
         coloredPrintf(BLUE, "TO");
         coloredPrintf(RED, "RASHKA\n");
     }
-    if (!singin())
+    if (!signin())
         return 0;
     double a = NAN, b = NAN, c = NAN;
     while (!getKoefs(&a, &b, &c, flags & (1 << FLAG_TYPEENTER))) {
@@ -112,7 +112,12 @@ bool parseKoefs(char *s, double *a, double *b, double *c) {
     assert(c != NULL);
     MYDEBUGPARSE printf("get: %s\n\n", s);
     double a_temp = 0, b_temp = 0, c_temp = 0, temp = 0;
-    int8_t mn = 1;
+    int8_t sign = 1;
+    char square_plus[] = "x^2+";
+    char x_plus[] = "x+";
+    char plus[] = "+";
+    char minus_x_plus[] = "-x+";
+    char minus_square_plus[] = "-x^2+";
     do {
         char *temp_s;
         temp = strtod(s, &temp_s);
@@ -120,32 +125,31 @@ bool parseKoefs(char *s, double *a, double *b, double *c) {
             temp = 1;
         }
         s = temp_s;
-        MYDEBUGPARSE printf("s: %s, temp: %lg, mn: %d, a b c: %lg %lg %lg\n", s,
-                            temp, mn, a_temp, b_temp, c_temp);
-        if (!strncmp(s, "x^2+", 4)) {
-            a_temp += temp * mn;
-            s += 4;
-        } else if (!strncmp(s, "x+", 2)) {
-            b_temp += temp * mn;
-            s += 2;
-        } else if (!strncmp(s, "+", 1)) {
-            c_temp += temp * mn;
-            s++;
-        } else if (!strncmp(s, "-x+", 3)) {
-            b_temp -= temp * mn;
-            s += 3;
-        } else if (!strncmp(s, "-x^2+", 5)) {
-            a_temp -= temp * mn;
-            s += 5;
+        MYDEBUGPARSE printf("s: %s, temp: %lg, mn: %d, a b c: %lg %lg %lg\n", s, temp, sign, a_temp, b_temp, c_temp);
+        if (!strncmp(s, square_plus, sizeof square_plus - 1)) {
+            a_temp += temp * sign;
+            s += sizeof square_plus - 1;
+        } else if (!strncmp(s, x_plus, sizeof x_plus - 1)) {
+            b_temp += temp * sign;
+            s += sizeof x_plus - 1;
+        } else if (!strncmp(s, plus, sizeof plus - 1)) {
+            c_temp += temp * sign;
+            s += sizeof plus - 1;
+        } else if (!strncmp(s, minus_x_plus, sizeof minus_x_plus - 1)) {
+            b_temp -= temp * sign;
+            s += sizeof minus_x_plus - 1;
+        } else if (!strncmp(s, minus_square_plus, sizeof minus_square_plus - 1)) {
+            a_temp -= temp * sign;
+            s += sizeof minus_square_plus - 1;
         } else if (s[0] != '\0') {
             MYDEBUGPARSE printf("s: %s, a b c: %lg %lg %lg\n", s, *a, *b, *c);
             return 1;
         }
         if (*s == '=') {
-            if (mn < 0)
+            if (sign < 0)
                 return 1;
             s++;
-            mn *= -1;
+            sign *= -1;
             if (*s == '+')
                 s++;
         }
@@ -200,13 +204,13 @@ KSolves solveSquare(double a, double b, double c, double *x1, double *x2) {
 void printSolves(KSolves solution_type, double x1, double x2) {
     switch (solution_type) {
     case ZERO_SOLVES:
-        puts("NO solves");
+        puts("NO solutions");
         break;
     case ONE_SOLVE:
-        printf("%lg -\n", x1);
+        printf("one solution: %lg -\n", x1);
         break;
     case TWO_SOLVES:
-        printf("%lg %lg\n", x1, x2);
+        printf("two solutions: %lg %lg\n", x1, x2);
         break;
     case INF_SOLVES:
         puts("ALL IN");
@@ -271,8 +275,7 @@ uint64_t parseArgs(int argc, char const *const *argv) {
     return flags;
 }
 
-void processFlagString(const int argc, char const *const *argv,
-                       uint64_t *flags) {
+void processFlagString(const int argc, char const *const *argv, uint64_t *flags) {
     assert(argv != NULL);
     assert(flags != NULL);
     MYDEBUGARGS {
@@ -297,8 +300,8 @@ void processFlagString(const int argc, char const *const *argv,
         *flags |= (1 << FLAG_DEBUGARGS);
     } else if (!strcmp("--debugparse", argv[0])) {
         *flags |= (1 << FLAG_DEBUGPARSE);
-    } else if (!strcmp("--singup", argv[0])) {
-        *flags |= (1 << FLAG_SINGUP);
+    } else if (!strcmp("--signup", argv[0])) {
+        *flags |= (1 << FLAG_SIGNUP);
     } else if (!strcmp("--randtest", argv[0])) {
         if (argc == 2) {
             if (!runRandomUnittest(strtol(argv[1], NULL, 10))) {
@@ -352,14 +355,15 @@ bool runUnittestsFromFile(const char *filename) {
     return !failed;
 }
 
+//TODO: random seed
 bool runRandomUnittest(long num_tests) {
     double a = NAN, b = NAN, c = NAN, x1 = NAN, x2 = NAN;
     KSolves solution_type = ZERO_SOLVES, solution_type_ref = ZERO_SOLVES;
     double x0 = NAN, y0 = NAN;
     for (int i = 0; i < num_tests; i++) {
-        a = (double)rand() / rand();
-        b = (double)rand() / rand();
-        c = (double)rand() / rand();
+        a = randDouble();
+        b = randDouble();
+        c = randDouble();
         if (!isZero(a)) {
             x0 = -b / (2 * a);
             y0 = countEq(a, b, c, x0);
@@ -398,8 +402,8 @@ bool runRandomUnittest(long num_tests) {
     }
     a = 0;
     for (int i = 0; i < num_tests; i++) {
-        b = (double)rand() / rand();
-        c = (double)rand() / rand();
+        b = randDouble();
+        c = randDouble();
         if (!isZero(b)) {
             solution_type_ref = ONE_SOLVE;
             solution_type = solveSquare(a, b, c, &x1, &x2);
