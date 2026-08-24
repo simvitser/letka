@@ -10,17 +10,20 @@ bool GLOBAL_DEBUG_PARSE = false;
 
 int main(const int argc, const char *const *argv) {
     runUnittests();
-    uint64_t flags = parseArgs(argc, argv);
-    GLOBAL_QUIET = flags & FLAG_QUIET;
-    GLOBAL_DEBUG_ARGS = flags & FLAG_DEBUGARGS;
-    GLOBAL_DEBUG_PARSE = flags & FLAG_DEBUGPARSE;
-    if (flags & FLAG_TESTFAILED) {
-        return MAINERRORS_FAILEDTESTS;
+    ArgValues values = parseArgs(argc, argv);
+    GLOBAL_QUIET = values.flags & FLAG_QUIET;
+    GLOBAL_DEBUG_ARGS = values.flags & FLAG_DEBUGARGS;
+    GLOBAL_DEBUG_PARSE = values.flags & FLAG_DEBUGPARSE;
+    if (values.flags & FLAG_SETSEED) {
+        srand(values.seed);
     }
-    if (flags & FLAG_RANDOMTESTFAILED) {
-        return MAINERRORS_FAILEDRANDOMTEST;
+    if (values.flags & FLAG_RUNTEST) {
+        if (!runUnittestsFromFile(values.filename)) return MAINERRORS_FAILEDTESTS;
     }
-    if (flags & FLAG_SIGNUP) {
+    if (values.flags & FLAG_RUNRANDOMTEST) {
+        if (!runRandomUnittest(values.num_tests)) return MAINERRORS_FAILEDRANDOMTEST;
+    }
+    if (values.flags & FLAG_SIGNUP) {
         signup();
         return 0;
     }
@@ -33,13 +36,13 @@ int main(const int argc, const char *const *argv) {
     if (!signin())
         return 0;
     double a = NAN, b = NAN, c = NAN;
-    while (!getKoefs(&a, &b, &c, flags & FLAG_TYPEENTER)) {
+    while (!getKoefs(&a, &b, &c, values.flags & FLAG_TYPEENTER)) {
         double x1 = NAN, x2 = NAN;
         KSolves solution_type = solveSquare(a, b, c, &x1, &x2);
         printSolves(solution_type, x1, x2);
-        if (flags & FLAG_DRAWPLOT) {
+        if (values.flags & FLAG_DRAWPLOT) {
             drawPlot(a, b, c);
-        } else if (flags & FLAG_DRAWPLOTOFFSET) {
+        } else if (values.flags & FLAG_DRAWPLOTOFFSET) {
             drawPlotOffset(a, b, c);
         }
     }
@@ -104,7 +107,7 @@ bool getKoefsNew(double *a, double *b, double *c) {
             }
         }
         s_result[result_index] = '+';
-    } while (result_index == 0 || parseKoefs(s_result, a, b, c) ||
+} while (result_index == 0 || parseKoefs(s_result, a, b, c) ||
              !(isfinite(*a) && isfinite(*b) && isfinite(*c)));
     printf("START SOLVING...\n");
     return false;
@@ -225,40 +228,29 @@ void printSolves(KSolves solution_type, double x1, double x2) {
     }
 }
 
-// TODO: split scheck and run, fix random tests
-bool runUnittest(double a, double b, double c, KSolves solution_type, double x1, double x2) {
-    double x1_test = NAN, x2_test = NAN;
-    KSolves solution_type_test = solveSquare(a, b, c, &x1_test, &x2_test);
-    if (solution_type != solution_type_test) {
+bool runUnittest(double a, double b, double c) {
+    double x1 = NAN, x2 = NAN;
+    KSolves solution_type = solveSquare(a, b, c, &x1, &x2);
+    if (!checkTestAnswer(a, b, c, solution_type, x1, x2)) {
+        QUIET printf("FAILED solve: a: %lg b: %lg c: %lg, x1: %lg x2: %lg\n",
+                         a, b, c, x1, x2);
         return false;
     }
-    switch (solution_type) {
-    case ZERO_SOLVES:
-        return true;
-    case ONE_SOLVE:
-        return isEqual(x1, x1_test);
-    case TWO_SOLVES:
-        return (isEqual(x1, x1_test) && isEqual(x2, x2_test)) ||
-               (isEqual(x2, x1_test) && isEqual(x1, x2_test));
-    case INF_SOLVES:
-        return true;
-    default:
-        assert(false);
-    }
+    return true;
 }
 
 void runUnittests() {
 #ifdef TESTS
-    assert(runUnittest(0, 0, 0, INF_SOLVES, 0, 0));
-    assert(runUnittest(4, 5, 6, ZERO_SOLVES, 0, 0));
-    assert(runUnittest(1, 2, 1, ONE_SOLVE, -1, 0));
-    assert(runUnittest(2, -24, 64, TWO_SOLVES, 4, 8));
+    assert(runUnittest(0, 0, 0));
+    assert(runUnittest(4, 5, 6));
+    assert(runUnittest(1, 2, 1));
+    assert(runUnittest(2, -24, 64));
 #endif
 }
 
-uint64_t parseArgs(int argc, char const *const *argv) {
+ArgValues parseArgs(int argc, char const *const *argv) {
     assert(argv != NULL);
-    uint64_t flags = 0;
+    ArgValues ans = {.filename=NULL, .num_tests=0, .seed=42, .flags=0};
     for (int i = 1; i < argc; i++) {
         if (strncmp("--", argv[i], 2) == 0) {
             const char *args[MAX_ARGS_PER_FLAG] = {0};
@@ -272,16 +264,16 @@ uint64_t parseArgs(int argc, char const *const *argv) {
                     break;
                 }
             }
-            processFlagString(argcc, args, &flags);
+            processFlagString(argcc, args, &ans);
             i += argcc - 1;
         }
     }
-    return flags;
+    return ans;
 }
-//TODO: добавить возврат структур
-void processFlagString(const int argc, char const *const *argv, uint64_t *flags) {
+
+void processFlagString(const int argc, char const *const *argv, ArgValues* values) {
     assert(argv != NULL);
-    assert(flags != NULL);
+    assert(values != NULL);
     MYDEBUGARGS {
         printf("\n\n%s\nargs = %d\nargs = ", argv[0], argc);
         for (int i = 1; i < argc; i++) {
@@ -290,7 +282,7 @@ void processFlagString(const int argc, char const *const *argv, uint64_t *flags)
         putchar('\n');
     }
     if (!strcmp("--quiet", argv[0])) {
-        *flags |= (1 << FLAG_QUIET);
+        values->flags |= (1 << FLAG_QUIET);
     } else if (!strcmp("--help", argv[0])) {
         printf("Usage:\n"
                "--quiet                     disable dialog outputs\n"
@@ -301,34 +293,34 @@ void processFlagString(const int argc, char const *const *argv, uint64_t *flags)
                "--drawplot                  draw a plot\n"
                "--drawplotoffset            draw a plot by offsets\n"
                "--signup                    register a user\n"
-               "--randtests [num_tests]      generate random tests\n"
+               "--randtests [num_tests]     generate random tests\n"
                "--seed [seed]               set seed\n");
     } else if (!strcmp("--oldenter", argv[0])) {
-        *flags |= FLAG_TYPEENTER;
+        values->flags |= FLAG_TYPEENTER;
     } else if (!strcmp("--testin", argv[0])) {
         if (argc == 2) {
-            if (!runUnittestsFromFile(argv[1]))
-                *flags |= FLAG_TESTFAILED;
+            values->flags |= FLAG_RUNTEST;
+            values->filename = argv[1];
         }
     } else if (!strcmp("--debugargs", argv[0])) {
-        *flags |= FLAG_DEBUGARGS;
+        values->flags |= FLAG_DEBUGARGS;
     } else if (!strcmp("--debugparse", argv[0])) {
-        *flags |= FLAG_DEBUGPARSE;
+        values->flags |= FLAG_DEBUGPARSE;
     } else if (!strcmp("--drawplot", argv[0])) {
-        *flags |= FLAG_DRAWPLOT;
+        values->flags |= FLAG_DRAWPLOT;
     } else if (!strcmp("--drawplotoffset", argv[0])) {
-        *flags |= FLAG_DRAWPLOTOFFSET;
+        values->flags |= FLAG_DRAWPLOTOFFSET;
     } else if (!strcmp("--signup", argv[0])) {
-        *flags |= FLAG_SIGNUP;
+        values->flags |= FLAG_SIGNUP;
     } else if (!strcmp("--randtests", argv[0])) {
         if (argc == 2) {
-            if (!runRandomUnittest(strtol(argv[1], NULL, 10))) {
-                *flags |= FLAG_RANDOMTESTFAILED;
-            }
+            values->flags |= FLAG_RUNRANDOMTEST;
+            values->num_tests = strtol(argv[1], NULL, 10);
         }
     } else if (!strcmp("--seed", argv[0])) {
         if (argc == 2) {
-            srand((uint32_t)strtol(argv[1], NULL, 10));
+            values->flags |= FLAG_SETSEED;
+            values->seed = (uint32_t)strtol(argv[1], NULL, 10);
         }
     }
 }
@@ -341,103 +333,34 @@ bool runUnittestsFromFile(const char *filename) {
         return false;
     }
     double a = NAN, b = NAN, c = NAN;
-    char solution_type_char = 0;
-    bool failed = false;
-    printf("starting tests...\n");
-    while (fscanf(file, "%lg %lg %lg %c", &a, &b, &c, &solution_type_char) == 4) {
-        KSolves solution_type_ref = ZERO_SOLVES;
-        double x1 = NAN, x2 = NAN;
-        switch (solution_type_char) {
-        case '0':
-            solution_type_ref = ZERO_SOLVES;
-            break;
-        case '1':
-            fscanf(file, "%lg", &x1);
-            solution_type_ref = ONE_SOLVE;
-            break;
-        case '2':
-            fscanf(file, "%lg %lg", &x1, &x2);
-            solution_type_ref = TWO_SOLVES;
-            break;
-        default:
-            solution_type_ref = INF_SOLVES;
-            break;
-        }
-        bool ans = runUnittest(a, b, c, solution_type_ref, x1, x2);
+    QUIET printf("starting tests from file...\n");
+    while (fscanf(file, "%lg %lg %lg", &a, &b, &c) == 3) {
+        bool ans = runUnittest(a, b, c);
         if (!ans) {
-            coloredPrintf(RED, "FAILED: "); //TODO: ALL FAILED RED адекватно
-            printf("%lg %lg %lg solution_type: %d solves: %lg %lg\n", a, b, c, solution_type_ref, x1, x2);
-            failed = true;
+            return false;
         }
-    }
-    if (!failed) {
-        coloredPrintf(GREEN, "Tests complete!\n");
-    }
+    } 
     fclose(file);
-    return !failed;
+    QUIET coloredPrintf(GREEN, "TEST FROM FILE PASSED\n");
+    return true;
 }
 
 bool runRandomUnittest(long num_tests) {
+    QUIET printf("starting tests from file...\n");
     double a = NAN, b = NAN, c = NAN, x1 = NAN, x2 = NAN, x1_ref = NAN, x2_ref = NAN;
-    KSolves solution_type = ZERO_SOLVES, solution_type_ref = ZERO_SOLVES;
-    double x0 = NAN, y0 = NAN;
     for (int i = 0; i < num_tests; i++) {
         a = randDouble();
         b = randDouble();
         c = randDouble();
-        if (!isZero(a)) {
-            x0 = -b / (2 * a);
-            y0 = countEq(a, b, c, x0);
-            if (y0 < -EPS) {
-                solution_type_ref = TWO_SOLVES;
-            } else if (y0 < EPS) {
-                solution_type_ref = ONE_SOLVE;
-            } else {
-                solution_type_ref = ZERO_SOLVES;
-            }
-            solution_type = solveSquare(a, b, c, &x1, &x2);
-            if (solution_type != solution_type_ref) {
-                QUIET printf("FAILED solution_type: a b c: %lg %lg %lg\n", a, b, c);
-                return false;
-            }
-            switch (solution_type) {
-            case ZERO_SOLVES:
-                break;
-            case ONE_SOLVE:
-                if (!isZero(countEq(a, b, c, x1))) {
-                    QUIET printf("FAILED solve: a b c x: %lg %lg %lg %lg\n", a, b, c, x1);
-                    return false;
-                }
-                break;
-            case TWO_SOLVES:
-                if (!isZero(countEq(a, b, c, x1)) ||
-                    !isZero(countEq(a, b, c, x2))) {
-                    QUIET printf(
-                        "FAILED solve: a b c x1 x2: %lg %lg %lg %lg %lg\n", a, b, c, x1, x2);
-                    return false;
-                }
-                break;
-            case INF_SOLVES:
-            default:
-                assert(false);
-            }
+        if (!runUnittest(a, b, c)) {
+            return false;
         }
     }
-    a = 0;
     for (int i = 0; i < num_tests; i++) {
         b = randDouble();
         c = randDouble();
-        if (!isZero(b)) {
-            solution_type_ref = ONE_SOLVE;
-            solution_type = solveSquare(a, b, c, &x1, &x2);
-            if (solution_type != solution_type_ref) {
-                QUIET printf("FAILED solution_type: a b c: %lg %lg %lg\n", a, b, c);
-                return false;
-            }
-            if (!isZero(countEq(a, b, c, x1))) {
-                QUIET printf("FAILED solve: a b c x: %lg %lg %lg %lg\n", a, b, c, x1);
-                return false;
-            }
+        if (!runUnittest(0, b, c)) {
+            return false;
         }
     }
     for (int i = 0; i < num_tests; i++) {
@@ -451,15 +374,12 @@ bool runRandomUnittest(long num_tests) {
         a = randDouble();
         b = -a * (x1_ref + x2_ref);
         c = x1_ref * x2_ref * a;
-        solution_type = solveSquare(a, b, c, &x1, &x2);
-        if (solution_type != TWO_SOLVES || !isEqual(x1, x1_ref) ||
-            !isEqual(x2, x2_ref)) {
-            QUIET printf("FAILED solve: a b c: %lg %lg %lg x1: %lg x2: %lg x1_ref: %lg x2_ref: %lg\n",
-                         a, b, c, x1, x2, x1_ref, x2_ref);
+        KSolves solution_type = solveSquare(a, b, c, &x1, &x2);
+        if (!checkTestAnswer(a, b, c, solution_type, x1, x2)) {
             return false;
         }
     }
-    QUIET printf("TEST PASSED\n");
+    QUIET coloredPrintf(GREEN, "RANDOM TEST PASSED\n");
     return true;
 }
 
@@ -467,15 +387,48 @@ double countEq(double a, double b, double c, double x) {
     return a * x * x + b * x + c;
 }
 
-//TODO: fix x+1
+bool checkTestAnswer(double a, double b, double c, KSolves solution_type_ans, double x1, double x2) {
+    KSolves solution_type_ref = getRightSolutionType(a, b, c);
+    if (solution_type_ans != solution_type_ref) return false;
+    switch (solution_type_ans) {
+        case ZERO_SOLVES:
+        case INF_SOLVES:
+            return true;
+        case ONE_SOLVE:
+            return isZero(countEq(a, b, c, x1));
+        case TWO_SOLVES:
+            return isZero(countEq(a, b, c, x1)) && isZero(countEq(a, b, c, x2));
+        default:
+            assert(false);
+    }
+}
+
+KSolves getRightSolutionType(double a, double b, double c) {
+    if (!isZero(a)) {
+        double x0 = -b / (2 * a);
+        double y0 = countEq(a, b, c, x0);
+        if (y0 < -EPS) {
+            return TWO_SOLVES;
+        } else if (y0 < EPS) {
+            return ONE_SOLVE;
+        } else {
+            return ZERO_SOLVES;
+        }
+    } else if (!isZero(b)) {
+        return ONE_SOLVE;
+    } else if (!isZero(c)) {
+        return ZERO_SOLVES;
+    } else {
+        return INF_SOLVES;
+    }
+}
+
 void drawPlotOffset(double a, double b, double c) {
     assert(isfinite(a));
     assert(isfinite(b));
     assert(isfinite(c));
-    char plot[SIZE_PLOT_Y][SIZE_PLOT_X + 1] = {};
-    for (int i = 0; i < SIZE_PLOT_Y; i++) {
-        memset(plot[i], ' ', sizeof plot[i] - 1);
-    }
+    char plot[SIZE_PLOT_Y][SIZE_PLOT_X] = {}; 
+    memset(plot, ' ', sizeof plot);
     for (int i = 0; i < SIZE_PLOT_X; i++) {
         plot[SIZE_PLOT_Y / 2][i] = '-';
     }
@@ -500,7 +453,7 @@ void drawPlotOffset(double a, double b, double c) {
     }
 
     for (int i = 0; i < SIZE_PLOT_Y; i++) {
-        printf("%s\n", plot[i]);
+        printf("%.*s\n", SIZE_PLOT_X, plot[i]);
     }
 }
 
