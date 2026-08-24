@@ -39,17 +39,31 @@ typedef struct {
     double a, b, c;
 } SquareKoefs;
 
+
 enum FLAG_BYTES {
-    FLAG_QUIET = 0, 
-    FLAG_TYPEENTER, 
-    FLAG_TESTFAILED, 
-    FLAG_DEBUGARGS, 
-    FLAG_DEBUGPARSE, 
-    FLAG_SIGNUP, 
-    FLAG_RANDOMTESTFAILED,
-    FLAG_DRAWPLOT,
-    FLAG_DRAWPLOTOFFSET
+    FLAG_QUIET = (1U << 0), 
+    FLAG_TYPEENTER = (1U << 1), 
+    FLAG_TESTFAILED = (1U << 2), 
+    FLAG_DEBUGARGS = (1U << 3), 
+    FLAG_DEBUGPARSE = (1U << 4), 
+    FLAG_SIGNUP = (1U << 5), 
+    FLAG_RANDOMTESTFAILED = (1U << 6),
+    FLAG_DRAWPLOT = (1U << 7),
+    FLAG_DRAWPLOTOFFSET = (1U << 8)
 };
+
+
+// enum FLAG_BYTES {
+//     FLAG_QUIET = 0, 
+//     FLAG_TYPEENTER, 
+//     FLAG_TESTFAILED, 
+//     FLAG_DEBUGARGS, 
+//     FLAG_DEBUGPARSE, 
+//     FLAG_SIGNUP, 
+//     FLAG_RANDOMTESTFAILED,
+//     FLAG_DRAWPLOT,
+//     FLAG_DRAWPLOTOFFSET
+// };   // old
 
 enum MAINERRORS {
     MAINERRORS_FAILEDTESTS = 67,

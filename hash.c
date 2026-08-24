@@ -95,5 +95,6 @@ bool signin() {
         }
     }
     coloredPrintf(RED, "Who are you? sing up!\n");
+    fclose(file);
     return false;
 }

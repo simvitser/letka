@@ -3,15 +3,17 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define BLACK 30
-#define RED 31
-#define GREEN 32
-#define YELLOW 33
-#define BLUE 34
-#define PURPLE 35
-#define LIGHTBLUE 36
-#define WHITE 37
-#define STANDART 39
+enum COLORS {
+    BLACK = 30,
+    RED,
+    GREEN,
+    YELLOW,
+    BLUE,
+    PURPLE,
+    LIGHTBLUE,
+    WHITE,
+    STANDART = 39
+};
 
 void coloredPrintf(uint8_t text_color, const char *s);
 #endif

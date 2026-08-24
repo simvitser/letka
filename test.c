@@ -2,5 +2,7 @@
 #include <stdlib.h>
 
 int main() {
-  printf("%d\n", sizeof "123");
+    char s[] = "ggggggggdgdgdgdgdgddg!";
+    printf("%.10s\n", s);
+    return 0;
 }
