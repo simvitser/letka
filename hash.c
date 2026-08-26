@@ -1,5 +1,10 @@
-#include "hash.h"
+#include <assert.h>
+#include <stdio.h>
+#include <string.h>
 
+#include "colors.h"
+#include "common.h"
+#include "hash.h"
 
 uint64_t hash1(const char *s) {
     assert(s != NULL);
@@ -25,15 +30,16 @@ uint64_t hash2(const char *s) {
 }
 
 void signup() {
-    char login[MAX_LEN_LOGIN] = {0};
-    char password1[MAX_LEN_PASSWORD] = {0};
-    char password2[MAX_LEN_PASSWORD] = {0};
+    char login[MAX_LEN_LOGIN + 1] = {0};
+    char password1[MAX_LEN_PASSWORD + 1] = {0};
+    char password2[MAX_LEN_PASSWORD + 1] = {0};
+
     printf("Enter a login\n>>> ");
-    scanf("%s", login);
+    scanf("%" STR(MAX_LEN_LOGIN) "s", login);
     printf("Enter a password\n>>> ");
-    scanf("%s", password1);
+    scanf("%" STR(MAX_LEN_PASSWORD) "s", password1);
     printf("Repeat password\n>>> ");
-    scanf("%s", password2);
+    scanf("%" STR(MAX_LEN_PASSWORD) "s", password2);
     if (strcmp(password1, password2)) {
         coloredPrintf(RED, "THEY MUST BE SAME!\n");
         return;
@@ -65,14 +71,14 @@ void signup() {
 }
 
 bool signin() {
-    char login[MAX_LEN_LOGIN] = {0};
-    char password[MAX_LEN_PASSWORD] = {0};
-    char login_temp[MAX_LEN_LOGIN] = {0};
+    char login[MAX_LEN_LOGIN + 1] = {0};
+    char password[MAX_LEN_PASSWORD + 1] = {0};
+    char login_temp[MAX_LEN_LOGIN + 1] = {0};
     printf("Please, enter login\n>>> ");
-    scanf("%s", login);
+    scanf("%" STR(MAX_LEN_LOGIN) "s", login);
     clearInputBuffer();
     printf("Password\n>>> ");
-    scanf("%s", password);
+    scanf("%" STR(MAX_LEN_PASSWORD) "s", password);
     clearInputBuffer();
     uint64_t h1 = hash1(password);
     uint64_t h2 = hash2(password);

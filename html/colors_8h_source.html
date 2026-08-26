@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.18.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>solve_square: colors.h Source File</title>
+<title>My Project: colors.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="codefolding.js"></script>
 <script type="text/javascript" src="clipboard.js"></script>
@@ -25,7 +25,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">solve_square
+   <div id="projectname">My Project
    </div>
   </td>
  </tr>
@@ -114,20 +114,21 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('colors_8h_sour
 <div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#ifndef _COLORS_H</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#define _COLORS_H</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;stdint.h&gt;</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;stdio.h&gt;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#define BLACK 30</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#define RED 31</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#define GREEN 32</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#define YELLOW 33</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#define BLUE 34</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#define PURPLE 35</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#define LIGHTBLUE 36</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#define WHITE 37</span></div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#define STANDART 39</span></div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keywordtype">void</span> coloredPrintf(uint8_t text_color, <span class="keywordtype">char</span> s[]);</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="keyword">enum</span> COLORS {</div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>    BLACK = 30,</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>    RED,</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>    GREEN,</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>    YELLOW,</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>    BLUE,</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>    PURPLE,</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>    LIGHTBLUE,</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    WHITE,</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    STANDART = 39</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>};</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="keywordtype">void</span> coloredPrintf(uint8_t text_color, <span class="keyword">const</span> <span class="keywordtype">char</span> *s);</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 </div><!-- container -->

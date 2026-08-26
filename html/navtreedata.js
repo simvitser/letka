@@ -24,7 +24,11 @@
 */
 var NAVTREE =
 [
-  [ "solve_square", "index.html", [
+  [ "My Project", "index.html", [
+    [ "Data Structures", "annotated.html", [
+      [ "Data Structures", "annotated.html", "annotated_dup" ],
+      [ "Data Structure Index", "classes.html", null ]
+    ] ],
     [ "Files", "files.html", [
       [ "File List", "files.html", "files_dup" ]
     ] ]
@@ -33,7 +37,7 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"colors_8h_source.html"
+"annotated.html"
 ];
 
 const SYNCONMSG = 'click to disable panel synchronization';

@@ -1,7 +1,6 @@
 #ifndef _COLORS_H
 #define _COLORS_H
 #include <stdint.h>
-#include <stdio.h>
 
 enum COLORS {
     BLACK = 30,

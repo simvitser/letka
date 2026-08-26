@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "colors.h"
 
 void coloredPrintf(uint8_t text_color, const char *s) {

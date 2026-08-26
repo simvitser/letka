@@ -2,13 +2,23 @@
 #define MYDEBUGARGS if (GLOBAL_DEBUG_PARSE)
 #define MYDEBUGPARSE if (GLOBAL_DEBUG_PARSE)
 
-#include "main.h"
-bool GLOBAL_QUIET = false;
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+#include <curses.h>
+#include <math.h>
 
+#include "colors.h"
+#include "hash.h"
+#include "common.h"
+#include "main.h"
+
+bool GLOBAL_QUIET = false;
 bool GLOBAL_DEBUG_ARGS = false;
 bool GLOBAL_DEBUG_PARSE = false;
 
-int main(const int argc, const char *const *argv) {
+int main(const int argc, const char *argv[]) {
     runUnittests();
     ArgValues values = parseArgs(argc, argv);
     GLOBAL_QUIET = values.flags & FLAG_QUIET;
@@ -21,7 +31,7 @@ int main(const int argc, const char *const *argv) {
         if (!runUnittestsFromFile(values.filename)) return MAINERRORS_FAILEDTESTS;
     }
     if (values.flags & FLAG_RUNRANDOMTEST) {
-        if (!runRandomUnittest(values.num_tests)) return MAINERRORS_FAILEDRANDOMTEST;
+        if (!runRandomTest(values.num_tests)) return MAINERRORS_FAILEDRANDOMTEST;
     }
     if (values.flags & FLAG_SIGNUP) {
         signup();
@@ -34,42 +44,36 @@ int main(const int argc, const char *const *argv) {
         coloredPrintf(RED, "RASHKA\n");
     }
     if (!signin())
-        return 0;
-    double a = NAN, b = NAN, c = NAN;
-    while (!getKoefs(&a, &b, &c, values.flags & FLAG_TYPEENTER)) {
+        return MAINERRORS_FAILEDSIGNIN;
+    SquareKoefs koefs = {NAN, NAN, NAN};
+    while (!getKoefs(&koefs, values.flags & FLAG_TYPEENTER)) {
         double x1 = NAN, x2 = NAN;
-        KSolves solution_type = solveSquare(a, b, c, &x1, &x2);
+        KSolves solution_type = solveSquare(koefs, &x1, &x2);
         printSolves(solution_type, x1, x2);
         if (values.flags & FLAG_DRAWPLOT) {
-            drawPlot(a, b, c);
+            drawPlot(koefs);
         } else if (values.flags & FLAG_DRAWPLOTOFFSET) {
-            drawPlotOffset(a, b, c);
+            drawPlotOffset(koefs);
         }
     }
     QUIET printf("Bye bye! ;)\n");
     return 0;
 }
 
-bool getKoefs(double *a, double *b, double *c, bool typeenter) {
-    assert(a != NULL);
-    assert(b != NULL);
-    assert(c != NULL);
+bool getKoefs(SquareKoefs *koefs, bool typeenter) {
+    assert(koefs != NULL);
     if (typeenter) {
-        return getKoefsOld(a, b, c);
+        return getKoefsOld(koefs);
     }
-    return getKoefsNew(a, b, c);
+    return getKoefsNew(koefs);
 }
 
-bool getKoefsOld(double *a, double *b, double *c) {
-    assert(a != NULL);
-    assert(b != NULL);
-    assert(c != NULL);
-    assert(a != b);
-    assert(b != c);
-    assert(a != c);
+// [[deprecated("This is old method, use getKoefs")]]
+bool getKoefsOld(SquareKoefs *koefs) {
+    assert(koefs != NULL); 
     QUIET printf("(old) enter a b c\n>>> ");
     int ch = 0;
-    while (scanf("%lg %lg %lg", a, b, c) != 3) {
+    while (scanf("%lg %lg %lg", &(koefs->a), &(koefs->b), &(koefs->c)) != 3) {
         while ((ch = getchar()) != '\n') {
             if (ch == 'q' || ch == EOF)
                 return 1;
@@ -80,13 +84,8 @@ bool getKoefsOld(double *a, double *b, double *c) {
     return 0;
 }
 
-bool getKoefsNew(double *a, double *b, double *c) {
-    assert(a != NULL);
-    assert(b != NULL);
-    assert(c != NULL);
-    assert(a != b);
-    assert(b != c);
-    assert(a != c);
+bool getKoefsNew(SquareKoefs *koefs) {
+    assert(koefs != NULL); 
     char s_input[MAX_LEN] = {0};
     char s_result[MAX_LEN * 2] = {0};
     int result_index = 1;
@@ -107,19 +106,17 @@ bool getKoefsNew(double *a, double *b, double *c) {
             }
         }
         s_result[result_index] = '+';
-} while (result_index == 0 || parseKoefs(s_result, a, b, c) ||
-             !(isfinite(*a) && isfinite(*b) && isfinite(*c)));
+    } while (result_index == 0 || parseKoefs(s_result, koefs) ||
+        !(isfinite(koefs->a) && isfinite(koefs->b) && isfinite(koefs->c)));
     printf("START SOLVING...\n");
     return false;
 }
 
-bool parseKoefs(char *s, double *a, double *b, double *c) {
-    assert(s != NULL);
-    assert(a != NULL);
-    assert(b != NULL);
-    assert(c != NULL);
-    MYDEBUGPARSE printf("get: %s\n\n", s);
-    double a_temp = 0, b_temp = 0, c_temp = 0;
+bool parseKoefs(char *s_input, SquareKoefs *koefs) {
+    assert(s_input != NULL);
+    assert(koefs != NULL);
+    MYDEBUGPARSE printf("get: %s\n\n", s_input);
+    double a_sum = 0, b_sum = 0, c_sum = 0;
     int8_t sign = 1;
     static const char square_plus[] = "x^2+";
     static const char x_plus[] = "x+";
@@ -128,44 +125,44 @@ bool parseKoefs(char *s, double *a, double *b, double *c) {
     static const char minus_square_plus[] = "-x^2+";
     do {
         char *parse_end = NULL;
-        double num_now = strtod(s, &parse_end);
-        if (s == parse_end) {
+        double num_now = strtod(s_input, &parse_end);
+        if (s_input == parse_end) {
             num_now = 1;
         }
-        s = parse_end;
-        MYDEBUGPARSE printf("s: %s, temp: %lg, mn: %d, a b c: %lg %lg %lg\n", s, num_now, sign, a_temp, b_temp, c_temp);
-        if (!strncmp(s, square_plus, STATIC_STRLEN(square_plus))) {
-            a_temp += num_now * sign; //TODO:  a_sum, s = s_input, 
-            s += STATIC_STRLEN(square_plus);
-        } else if (!strncmp(s, x_plus, STATIC_STRLEN(x_plus))) {
-            b_temp += num_now * sign;
-            s += STATIC_STRLEN(x_plus);
-        } else if (!strncmp(s, plus, STATIC_STRLEN(plus))) {
-            c_temp += num_now * sign;
-            s += STATIC_STRLEN(plus);
-        } else if (!strncmp(s, minus_x_plus, STATIC_STRLEN(minus_x_plus))) {
-            b_temp -= num_now * sign;
-            s += STATIC_STRLEN(minus_x_plus);
-        } else if (!strncmp(s, minus_square_plus, STATIC_STRLEN(minus_square_plus))) {
-            a_temp -= num_now * sign;
-            s += STATIC_STRLEN(minus_square_plus);
-        } else if (s[0] != '\0') {
-            MYDEBUGPARSE printf("s: %s, a b c: %lg %lg %lg\n", s, *a, *b, *c);
+        s_input = parse_end;
+        MYDEBUGPARSE printf("s: %s, temp: %lg, mn: %d, a b c: %lg %lg %lg\n", s_input, num_now, sign, a_sum, b_sum, c_sum);
+        if (!strncmp(s_input, square_plus, STATIC_STRLEN(square_plus))) {
+            a_sum += num_now * sign;
+            s_input += STATIC_STRLEN(square_plus);
+        } else if (!strncmp(s_input, x_plus, STATIC_STRLEN(x_plus))) {
+            b_sum += num_now * sign;
+            s_input += STATIC_STRLEN(x_plus);
+        } else if (!strncmp(s_input, plus, STATIC_STRLEN(plus))) {
+            c_sum += num_now * sign;
+            s_input += STATIC_STRLEN(plus);
+        } else if (!strncmp(s_input, minus_x_plus, STATIC_STRLEN(minus_x_plus))) {
+            b_sum -= num_now * sign;
+            s_input += STATIC_STRLEN(minus_x_plus);
+        } else if (!strncmp(s_input, minus_square_plus, STATIC_STRLEN(minus_square_plus))) {
+            a_sum -= num_now * sign;
+            s_input += STATIC_STRLEN(minus_square_plus);
+        } else if (s_input[0] != '\0') {
+            MYDEBUGPARSE printf("s: %s, a b c: %lg %lg %lg\n", s_input, koefs->a, koefs->b, koefs->c);
             return 1;
         }
-        if (*s == '=') {
+        if (*s_input == '=') {
             if (sign < 0)
                 return 1;
-            s++;
+            s_input++;
             sign *= -1;
-            if (*s == '+')
-                s++;
+            if (*s_input == '+')
+                s_input++;
         }
-    } while (*s != '\0');
-    *a = a_temp;
-    *b = b_temp;
-    *c = c_temp;
-    MYDEBUGPARSE printf("a b c: %lg %lg %lg\n", *a, *b, *c);
+    } while (*s_input != '\0');
+    koefs->a = a_sum;
+    koefs->b = b_sum;
+    koefs->c = c_sum;
+    MYDEBUGPARSE printf("a b c: %lg %lg %lg\n", koefs->a, koefs->b, koefs->c);
     return 0;
 }
 
@@ -182,29 +179,29 @@ KSolves solveLinear(double k, double b, double *x) {
     return ONE_SOLVE;
 }
 
-KSolves solveSquare(double a, double b, double c, double *x1, double *x2) {
-    assert(isfinite(a));
-    assert(isfinite(b));
-    assert(isfinite(c));
+KSolves solveSquare(SquareKoefs koefs, double *x1, double *x2) {
+    assert(isfinite(koefs.a));
+    assert(isfinite(koefs.b));
+    assert(isfinite(koefs.c));
     assert(x1 != NULL);
     assert(x2 != NULL);
     assert(x1 != x2);
 
-    if (isZero(a)) {
-        return solveLinear(b, c, x1);
+    if (isZero(koefs.a)) {
+        return solveLinear(koefs.b, koefs.c, x1);
     }
 
-    double D = b * b - 4 * a * c;
+    double D = koefs.b * koefs.b - 4 * koefs.a * koefs.c;
     if (D < -EPS) {
         return ZERO_SOLVES;
     } else if (D < EPS) {
-        *x1 = -b / 2 / a;
+        *x1 = -koefs.b / (2 * koefs.a);
         *x2 = *x1;
         return ONE_SOLVE;
     } else {
         double sqrtD = sqrt(D);
-        *x1 = (-b - sqrtD) / 2 / a;
-        *x2 = (-b + sqrtD) / 2 / a;
+        *x1 = (-koefs.b - sqrtD) / (2 * koefs.a);
+        *x2 = (-koefs.b + sqrtD) / (2 * koefs.a);
         return TWO_SOLVES;
     }
 }
@@ -228,50 +225,107 @@ void printSolves(KSolves solution_type, double x1, double x2) {
     }
 }
 
-bool runUnittest(double a, double b, double c) {
+bool runTest(SquareKoefs koefs) {
     double x1 = NAN, x2 = NAN;
-    KSolves solution_type = solveSquare(a, b, c, &x1, &x2);
-    if (!checkTestAnswer(a, b, c, solution_type, x1, x2)) {
+    KSolves solution_type = solveSquare(koefs, &x1, &x2);
+    if (!checkTestAnswer(koefs, solution_type, x1, x2)) {
         QUIET printf("FAILED solve: a: %lg b: %lg c: %lg, x1: %lg x2: %lg\n",
-                         a, b, c, x1, x2);
+                         koefs.a, koefs.b, koefs.c, x1, x2);
         return false;
     }
     return true;
 }
 
+bool runUnittest(TestCase test) {
+    double x1 = NAN, x2 = NAN;
+    bool passed = true;
+    KSolves solution_type = solveSquare(test.koefs, &x1, &x2);
+    if (solution_type != test.solution_type) {
+        passed = false;
+    } else {
+        switch (solution_type) {
+        case ZERO_SOLVES:
+            passed = true;
+            break;
+        case ONE_SOLVE:
+            passed = isEqual(test.x1, x1);
+            break;
+        case TWO_SOLVES:
+            passed = (isEqual(test.x1, x1) && isEqual(test.x2, x2)) || (isEqual(test.x2, x1) && isEqual(test.x1, x2));\
+            break;
+        case INF_SOLVES:
+            passed = true;
+            break;
+        default:
+            assert(false);
+        }
+    }
+    if (!passed) {
+        QUIET printf("FAILED solve: a: %lg b: %lg c: %lg, x1: %lg x2: %lg, x1_ref: %lg, x2_ref: %lg, solution_type: %d, solution_type_ref: %d\n",
+                         test.koefs.a, test.koefs.b, test.koefs.c, 
+                         x1, x2, test.x1, test.x2, 
+                         solution_type, test.solution_type);
+    }
+    return passed;
+
+}
+
 void runUnittests() {
 #ifdef TESTS
-    assert(runUnittest(0, 0, 0));
-    assert(runUnittest(4, 5, 6));
-    assert(runUnittest(1, 2, 1));
-    assert(runUnittest(2, -24, 64));
+    assert(runUnittest((TestCase){ {0,   0,   0},   INF_SOLVES        }));
+    assert(runUnittest((TestCase){ {4,   5,   6},  ZERO_SOLVES        }));
+    assert(runUnittest((TestCase){ {1,   2,   1},    ONE_SOLVE, -1    }));
+    assert(runUnittest((TestCase){ {2, -24,  64},   TWO_SOLVES,  4, 8 }));
 #endif
 }
 
 ArgValues parseArgs(int argc, char const *const *argv) {
     assert(argv != NULL);
+
     ArgValues ans = {.filename=NULL, .num_tests=0, .seed=42, .flags=0};
-    for (int i = 1; i < argc; i++) {
-        if (strncmp("--", argv[i], 2) == 0) {
-            const char *args[MAX_ARGS_PER_FLAG] = {0};
-            int argcc = 1;
-            args[0] = argv[i];
-            for (int j = i + 1; j < argc; j++) {
-                if (argv[j][0] != '-') {
-                    args[argcc] = argv[j];
-                    argcc++;
-                } else {
-                    break;
-                }
+
+    int i = 1;
+    while (strncmp("--", argv[i], 2)) i++;
+
+    for (; i < argc; i++) {
+        const char *argv_per_flag[MAX_ARGS_PER_FLAG] = {0};
+        int argc_per_flag = 1;
+        argv_per_flag[0] = argv[i];
+
+        for (i++; i < argc; i++) {
+            if (argv[i][0] != '-') {
+                argv_per_flag[argc_per_flag] = argv[i];
+                argc_per_flag++;
+            } else {
+                i--;
+                break;
             }
-            processFlagString(argcc, args, &ans);
-            i += argcc - 1;
         }
+        processFlagString(argc_per_flag, argv_per_flag, &ans);
     }
     return ans;
 }
 
-void processFlagString(const int argc, char const *const *argv, ArgValues* values) {
+static const myFlag FLAGS[] = {
+    {"--quiet",          FLAG_QUIET,            NULL,    "disable dialog outputs"},
+    {"--oldenter",       FLAG_TYPEENTER,        NULL,    "enable old enter (a b c)"},
+    {"--testin",         FLAG_RUNTEST,          NULL,    "parametr: [file.txt] unittests from file"},
+    {"--debugargs",      FLAG_DEBUGARGS,        NULL,    "debug argparse"},
+    {"--debugparse",     FLAG_DEBUGPARSE,       NULL,    "debug parsing eq"},
+    {"--drawplot",       FLAG_DRAWPLOT,         NULL,    "draw a plot"},
+    {"--drawplotoffset", FLAG_DRAWPLOTOFFSET,   NULL,    "draw a plot by offsets"},
+    {"--signup",         FLAG_SIGNUP,           NULL,    "register a user"},
+    {"--randtests",      FLAG_RUNRANDOMTEST,    NULL,    "parametr: [num_tests] generate random tests"},
+    {"--seed",           FLAG_SETSEED,          NULL,    "parametr: [seed] set seed"}
+};
+
+// void setSeed(const int argc, const char *argv[]) {
+//     if (argc == 2) {
+//         srand((uint32_t)strtol(argv[1], NULL, 10));
+//     }
+// }
+
+void processFlagString(const int argc, char const *argv[], ArgValues* values) {
     assert(argv != NULL);
     assert(values != NULL);
     MYDEBUGARGS {
@@ -325,6 +379,7 @@ void processFlagString(const int argc, char const *const *argv, ArgValues* value
     }
 }
 
+
 bool runUnittestsFromFile(const char *filename) {
     assert(filename != NULL);
     FILE *file = fopen(filename, "r");
@@ -332,34 +387,56 @@ bool runUnittestsFromFile(const char *filename) {
         coloredPrintf(RED, "FILE DOESN'T EXIST\n");
         return false;
     }
-    double a = NAN, b = NAN, c = NAN;
-    QUIET printf("starting tests from file...\n");
-    while (fscanf(file, "%lg %lg %lg", &a, &b, &c) == 3) {
-        bool ans = runUnittest(a, b, c);
-        if (!ans) {
-            return false;
+    SquareKoefs koefs = {};
+    char solution_type_char = 0;
+    bool passed = true;
+    printf("starting tests...\n");
+    while (fscanf(file, "%lg %lg %lg %c", &koefs.a, &koefs.b, &koefs.c, &solution_type_char) == 4) {
+        KSolves solution_type_ref = ZERO_SOLVES;
+        double x1 = NAN, x2 = NAN;
+        switch (solution_type_char) {
+        case '0':
+            solution_type_ref = ZERO_SOLVES;
+            break;
+        case '1':
+            fscanf(file, "%lg", &x1);
+            solution_type_ref = ONE_SOLVE;
+            break;
+        case '2':
+            fscanf(file, "%lg %lg", &x1, &x2);
+            solution_type_ref = TWO_SOLVES;
+            break;
+        default:
+            solution_type_ref = INF_SOLVES;
+            break;
         }
-    } 
+        bool ans = runUnittest((TestCase) {(SquareKoefs) koefs, solution_type_ref, x1, x2});
+        passed = passed && ans;
+    }
+    if (passed) {
+        coloredPrintf(GREEN, "Tests complete!\n");
+    }
     fclose(file);
-    QUIET coloredPrintf(GREEN, "TEST FROM FILE PASSED\n");
-    return true;
+    return passed;
 }
 
-bool runRandomUnittest(long num_tests) {
+bool runRandomTest(long num_tests) {
     QUIET printf("starting tests from file...\n");
-    double a = NAN, b = NAN, c = NAN, x1 = NAN, x2 = NAN, x1_ref = NAN, x2_ref = NAN;
+    double x1 = NAN, x2 = NAN, x1_ref = NAN, x2_ref = NAN;
+    SquareKoefs koefs = {NAN, NAN, NAN};
     for (int i = 0; i < num_tests; i++) {
-        a = randDouble();
-        b = randDouble();
-        c = randDouble();
-        if (!runUnittest(a, b, c)) {
+        koefs.a = randDouble();
+        koefs.b = randDouble();
+        koefs.c = randDouble();
+        if (!runTest(koefs)) {
             return false;
         }
     }
+    koefs.a = 0;
     for (int i = 0; i < num_tests; i++) {
-        b = randDouble();
-        c = randDouble();
-        if (!runUnittest(0, b, c)) {
+        koefs.b = randDouble();
+        koefs.c = randDouble();
+        if (!runTest(koefs)) {
             return false;
         }
     }
@@ -371,11 +448,11 @@ bool runRandomUnittest(long num_tests) {
             x1_ref = x2_ref;
             x2_ref = temp;
         }
-        a = randDouble();
-        b = -a * (x1_ref + x2_ref);
-        c = x1_ref * x2_ref * a;
-        KSolves solution_type = solveSquare(a, b, c, &x1, &x2);
-        if (!checkTestAnswer(a, b, c, solution_type, x1, x2)) {
+        koefs.a = randDouble();
+        koefs.b = -koefs.a * (x1_ref + x2_ref);
+        koefs.c = x1_ref * x2_ref * koefs.a;
+        KSolves solution_type = solveSquare(koefs, &x1, &x2);
+        if (!checkTestAnswer(koefs, solution_type, x1, x2)) {
             return false;
         }
     }
@@ -383,30 +460,30 @@ bool runRandomUnittest(long num_tests) {
     return true;
 }
 
-double countEq(double a, double b, double c, double x) {
-    return a * x * x + b * x + c;
+double countEq(SquareKoefs koefs, double x) {
+    return koefs.a * x * x + koefs.b * x + koefs.c;
 }
 
-bool checkTestAnswer(double a, double b, double c, KSolves solution_type_ans, double x1, double x2) {
-    KSolves solution_type_ref = getRightSolutionType(a, b, c);
+bool checkTestAnswer(SquareKoefs koefs, KSolves solution_type_ans, double x1, double x2) {
+    KSolves solution_type_ref = getRightSolutionType(koefs);
     if (solution_type_ans != solution_type_ref) return false;
     switch (solution_type_ans) {
         case ZERO_SOLVES:
         case INF_SOLVES:
             return true;
         case ONE_SOLVE:
-            return isZero(countEq(a, b, c, x1));
+            return isZero(countEq(koefs, x1));
         case TWO_SOLVES:
-            return isZero(countEq(a, b, c, x1)) && isZero(countEq(a, b, c, x2));
+            return isZero(countEq(koefs, x1)) && isZero(countEq(koefs, x2));
         default:
             assert(false);
     }
 }
 
-KSolves getRightSolutionType(double a, double b, double c) {
-    if (!isZero(a)) {
-        double x0 = -b / (2 * a);
-        double y0 = countEq(a, b, c, x0);
+KSolves getRightSolutionType(SquareKoefs koefs) {
+    if (!isZero(koefs.a)) {
+        double x0 = -koefs.b / (2 * koefs.a);
+        double y0 = countEq(koefs, x0);
         if (y0 < -EPS) {
             return TWO_SOLVES;
         } else if (y0 < EPS) {
@@ -414,19 +491,19 @@ KSolves getRightSolutionType(double a, double b, double c) {
         } else {
             return ZERO_SOLVES;
         }
-    } else if (!isZero(b)) {
+    } else if (!isZero(koefs.b)) {
         return ONE_SOLVE;
-    } else if (!isZero(c)) {
+    } else if (!isZero(koefs.c)) {
         return ZERO_SOLVES;
     } else {
         return INF_SOLVES;
     }
 }
 
-void drawPlotOffset(double a, double b, double c) {
-    assert(isfinite(a));
-    assert(isfinite(b));
-    assert(isfinite(c));
+void drawPlotOffset(SquareKoefs koefs) {
+    assert(isfinite(koefs.a));
+    assert(isfinite(koefs.b));
+    assert(isfinite(koefs.c));
     char plot[SIZE_PLOT_Y][SIZE_PLOT_X] = {}; 
     memset(plot, ' ', sizeof plot);
     for (int i = 0; i < SIZE_PLOT_X; i++) {
@@ -437,30 +514,33 @@ void drawPlotOffset(double a, double b, double c) {
     }
     plot[SIZE_PLOT_Y / 2][SIZE_PLOT_X / 2] = '+';
 
-    double stepx = 0.2, stepy = 0.4, offsetx = 0, offsety = 0;
-    if (isZero(a)) {
-        offsety = -c;
+    double stepx = 5, stepy = 0.4, offsetx = 0, offsety = 0;
+    if (isZero(koefs.a)) {
+        offsety = -koefs.c;
     } else {
-        offsetx = b / (2 * a);
-        offsety = -countEq(a, b, c, -offsetx);
+        offsetx = koefs.b / (2 * koefs.a);
+        offsety = -countEq(koefs, -offsetx);
     }
 
     double y = NAN;
-    for (int i = 0; i < SIZE_PLOT_X; i++) {
-        y = (countEq(a, b, c, ((i - SIZE_PLOT_X / 2) - offsetx) * stepx) + offsety) * stepy;
+    for (int i = -SIZE_PLOT_X / 2; i < SIZE_PLOT_X / 2; i++) {
+        /* i - координата в точках
+        * поделив на stepx, получаем обычные координаты
+        * двигаем х, получаем ответ от функции, двигаем и переводим в точки
+        */
+        y = (countEq(koefs, i / stepx - offsetx) + offsety) * stepy;
         if (y < SIZE_PLOT_Y / 2 && y > -SIZE_PLOT_Y / 2)
-            plot[(int)(SIZE_PLOT_Y / 2 - y)][i] = '*';
+            plot[(int)(SIZE_PLOT_Y / 2 - y)][i + SIZE_PLOT_X / 2] = '*';
     }
-
     for (int i = 0; i < SIZE_PLOT_Y; i++) {
         printf("%.*s\n", SIZE_PLOT_X, plot[i]);
     }
 }
 
-void drawPlot(double a, double b, double c) {
-    assert(isfinite(a));
-    assert(isfinite(b));
-    assert(isfinite(c));
+void drawPlot(SquareKoefs koefs) {
+    assert(isfinite(koefs.a));
+    assert(isfinite(koefs.b));
+    assert(isfinite(koefs.c));
     char plot[SIZE_PLOT_Y][SIZE_PLOT_X] = {}; 
     memset(plot, ' ', sizeof plot);
     for (int i = 0; i < SIZE_PLOT_X; i++) {
@@ -471,16 +551,16 @@ void drawPlot(double a, double b, double c) {
     }
     plot[SIZE_PLOT_Y / 2][SIZE_PLOT_X / 2] = '+';
 
-    double stepx = 0.2, stepy = 0.4;
-    if (isZero(a)) {
-        if (fabs(c) * stepy > SIZE_PLOT_Y / 4 * 3) {
-            double scale = SIZE_PLOT_Y / 4 * 3 / c;
+    double stepx = 5, stepy = 0.4;
+    if (isZero(koefs.a)) {
+        if (fabs(koefs.c) * stepy > SIZE_PLOT_Y / 4 * 3) {
+            double scale = SIZE_PLOT_Y / 4 * 3 / koefs.c;
             stepx *= scale;
             stepy *= scale;
         }
     } else {
-        double x0 = -b / (2 * a);
-        double y0 = countEq(a, b, c, x0);
+        double x0 = -koefs.b / (2 * koefs.a);
+        double y0 = countEq(koefs, x0);
         while (fabs(x0) * stepx > SIZE_PLOT_X / 4 ||
                fabs(y0) * stepy > SIZE_PLOT_Y / 4) {
             stepx /= 2;
@@ -489,10 +569,10 @@ void drawPlot(double a, double b, double c) {
     }
 
     double y = NAN;
-    for (int i = 0; i < SIZE_PLOT_X; i++) {
-        y = countEq(a, b, c, (i - SIZE_PLOT_X / 2) * stepx) * stepy;
+    for (int i = -SIZE_PLOT_X / 2; i < SIZE_PLOT_X / 2; i++) {
+        y = countEq(koefs, i / stepx) * stepy;
         if (y < SIZE_PLOT_Y / 2 && y > -SIZE_PLOT_Y / 2)
-            plot[(int)(SIZE_PLOT_Y / 2 - y)][i] = '*';
+            plot[(int)(SIZE_PLOT_Y / 2 - y)][i + SIZE_PLOT_X / 2] = '*';
     }
 
     for (int i = 0; i < SIZE_PLOT_Y; i++) {

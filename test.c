@@ -2,7 +2,6 @@
 #include <stdlib.h>
 
 int main() {
-    char s[] = "ggggggggdgdgdgdgdgddg!";
-    printf("%.10s\n", s);
+    printf("%lg\n", 0/0);
     return 0;
 }

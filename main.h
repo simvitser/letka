@@ -1,17 +1,8 @@
 #ifndef _MAIN_H
 #define _MAIN_H
 
-#include "colors.h"
-#include "hash.h"
-#include <assert.h>
-#include <curses.h>
-#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 
 // #define quietColoredPrintf(color, smth) if (!GLOBAL_QUIET) coloredPrintf(color, smth)
 // #define quietPrintf(smth) if (!GLOBAL_QUIET) printf(smth)    // old version
@@ -40,11 +31,24 @@ typedef struct {
 } SquareKoefs;
 
 typedef struct {
+    SquareKoefs koefs;
+    KSolves solution_type;
+    double x1, x2;
+} TestCase;
+
+typedef struct {
     const char* filename;
     long num_tests;
     uint32_t seed;
     uint64_t flags;
 } ArgValues;
+
+typedef struct {
+    const char* name; 
+    uint64_t mask;
+    void (*function)(const int argc, const char *argv[]);
+    const char* usage; 
+} myFlag;
 
 
 enum FLAG_BYTES {
@@ -75,7 +79,8 @@ enum FLAG_BYTES {
 
 enum MAINERRORS {
     MAINERRORS_FAILEDTESTS = 67,
-    MAINERRORS_FAILEDRANDOMTEST
+    MAINERRORS_FAILEDRANDOMTEST,
+    MAINERRORS_FAILEDSIGNIN
 };
 
 /*!
@@ -83,6 +88,8 @@ enum MAINERRORS {
  * считывает все символы до \n
  */
 void runUnittests();
+bool runUnittest(TestCase test);
+bool runTest(SquareKoefs koefs);
 bool runUnittestsFromFile(const char *filename);
 
 /*!
@@ -92,20 +99,20 @@ bool runUnittestsFromFile(const char *filename);
  * @param[in] c - свободный член
  */
 ArgValues parseArgs(int argc, char const *const *argv);
-void processFlagString(const int argc, char const *const *args, ArgValues *values);
-bool getKoefsOld(double *a, double *b, double *c);
-bool getKoefsNew(double *a, double *b, double *c);
-bool parseKoefs(char *s, double *a, double *b, double *c);
-bool getKoefs(double *a, double *b, double *c, bool typeenter);
+/// process one flag
+void processFlagString(const int argc, char const *argv[], ArgValues *values);
+bool getKoefsOld(SquareKoefs* koefs);
+bool getKoefsNew(SquareKoefs *koefs);
+bool parseKoefs(char *s, SquareKoefs *koefs);
+bool getKoefs(SquareKoefs *koefs, bool typeenter);
 KSolves solveLinear(double k, double b, double *x);
-KSolves solveSquare(double a, double b, double c, double *x1, double *x2);
+KSolves solveSquare(SquareKoefs koefs, double *x1, double *x2);
 void printSolves(KSolves solution_type, double x1, double x2);
-bool runUnittest(double a, double b, double c);
-double countEq(double a, double b, double c, double x);
-bool runRandomUnittest(long num_tests);
-void drawPlot(double a, double b, double c);
-void drawPlotOffset(double a, double b, double c);
-KSolves getRightSolutionType(double a, double b, double c);
-bool checkTestAnswer(double a, double b, double c, KSolves solution_type_ans, double x1, double x2);
+double countEq(SquareKoefs koefs, double x);
+bool runRandomTest(long num_tests);
+void drawPlot(SquareKoefs koefs);
+void drawPlotOffset(SquareKoefs koefs);
+KSolves getRightSolutionType(SquareKoefs koefs);
+bool checkTestAnswer(SquareKoefs koefs, KSolves solution_type_ans, double x1, double x2);
 
 #endif

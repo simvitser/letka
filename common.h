@@ -1,12 +1,11 @@
 #ifndef _COMMON_H
 #define _COMMON_H
-#include <stdio.h>
 #include <stdbool.h>
-#include <math.h>
-#include <stdlib.h>
 
 #define EPS 1e-9
 #define STATIC_STRLEN(s) (sizeof(s) - 1)
+#define STR2(x) #x
+#define STR(x) STR2(x) //TODO: спросить Деда
 
 void clearInputBuffer();
 bool isZero(double n);
