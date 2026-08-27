@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 // #define quietColoredPrintf(color, smth) if (!GLOBAL_QUIET) coloredPrintf(color, smth)
-// #define quietPrintf(smth) if (!GLOBAL_QUIET) printf(smth)    // old version
+// #define quietPrintf(smth) if (!GLOBAL_QUIET) printf(smth)    // another version
 #define QUIET if (!GLOBAL_QUIET) 
 #define myassert(esp)                                                          \
     if (!(esp)) {                                                              \
@@ -14,9 +14,8 @@
         abort();                                                               \
     }
  
-#define MAX_ARGS_PER_FLAG 10 // максимальное количество аргументов у флага из командной строки
-#define MAX_LEN 100
-#define SIZE_PLOT_Y 41
+#define MAX_LEN 100 // максимальная длина вводимого уравнения
+#define SIZE_PLOT_Y 41 // размер графика
 #define SIZE_PLOT_X 121
 
 typedef enum {
@@ -41,15 +40,7 @@ typedef struct {
     long num_tests;
     uint32_t seed;
     uint64_t flags;
-} ArgValues;
-
-typedef struct {
-    const char* name; 
-    uint64_t mask;
-    void (*function)(const int argc, const char *argv[]);
-    const char* usage; 
-} myFlag;
-
+} ArgValues; // структура для возвращаемых значений
 
 enum FLAG_BYTES {
     FLAG_QUIET = (1U << 0), 
@@ -61,21 +52,9 @@ enum FLAG_BYTES {
     FLAG_RUNRANDOMTEST = (1U << 6),
     FLAG_DRAWPLOT = (1U << 7),
     FLAG_DRAWPLOTOFFSET = (1U << 8),
-    FLAG_SETSEED = (1U << 9)
+    FLAG_SETSEED = (1U << 9),
+    FLAG_HELP = (1U << 10)
 };
-
-
-// enum FLAG_BYTES {
-//     FLAG_QUIET = 0, 
-//     FLAG_TYPEENTER, 
-//     FLAG_TESTFAILED, 
-//     FLAG_DEBUGARGS, 
-//     FLAG_DEBUGPARSE, 
-//     FLAG_SIGNUP, 
-//     FLAG_RANDOMTESTFAILED,
-//     FLAG_DRAWPLOT,
-//     FLAG_DRAWPLOTOFFSET
-// };   // old
 
 enum MAINERRORS {
     MAINERRORS_FAILEDTESTS = 67,
@@ -83,36 +62,55 @@ enum MAINERRORS {
     MAINERRORS_FAILEDSIGNIN
 };
 
-/*!
- * функция для очистки входного буфера
- * считывает все символы до \n
- */
+// Функция запуска юнит тестов
 void runUnittests();
+// запуск одного юнит теста
 bool runUnittest(TestCase test);
+// запуск теста с проверкой постановкой
 bool runTest(SquareKoefs koefs);
+// юнит тесты из файла
 bool runUnittestsFromFile(const char *filename);
 
-/*!
+/*! старое, пытался doxygen но не создает
  * функция для ввода 3 чисел с плавающей точкой
  * @param[in] a - старший коэффициент
  * @param[in] b - коэффициент
  * @param[in] c - свободный член
  */
-ArgValues parseArgs(int argc, char const *const *argv);
-/// process one flag
-void processFlagString(const int argc, char const *argv[], ArgValues *values);
-bool getKoefsOld(SquareKoefs* koefs);
-bool getKoefsNew(SquareKoefs *koefs);
+bool getKoefsABC(SquareKoefs* koefs);
+// ввод уравнения с парсером
+bool getKoefsParser(SquareKoefs *koefs);
+// парсер коэффициентов из преобразованной строки
 bool parseKoefs(char *s, SquareKoefs *koefs);
+// ввод коэффициентов, запускает getKoefsABC или getKoefsParser по флагу 
 bool getKoefs(SquareKoefs *koefs, bool typeenter);
+
+// решатель квадратного уравнения
 KSolves solveLinear(double k, double b, double *x);
 KSolves solveSquare(SquareKoefs koefs, double *x1, double *x2);
+
+// вывод корней
 void printSolves(KSolves solution_type, double x1, double x2);
+
+// расчет ax^2 + bx + c
 double countEq(SquareKoefs koefs, double x);
+
+// запуск рандомных тестов
 bool runRandomTest(long num_tests);
+
+// построение графика на основе scale
 void drawPlot(SquareKoefs koefs);
+// постороение графика на основе смещений
 void drawPlotOffset(SquareKoefs koefs);
+
+// получение правильного типа решения на основе вершины параболы
 KSolves getRightSolutionType(SquareKoefs koefs);
+// проверка правильности ответа подстановкой
 bool checkTestAnswer(SquareKoefs koefs, KSolves solution_type_ans, double x1, double x2);
+
+// функции для флагов
+void setSeed(const int argc, const char *argv[], void *arg_values);
+void setTestFilename(const int argc, const char *argv[], void *arg_values);
+void setNumTests(const int argc, const char *argv[], void *arg_values);
 
 #endif

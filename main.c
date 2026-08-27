@@ -13,46 +13,67 @@
 #include "hash.h"
 #include "common.h"
 #include "main.h"
+#include "parser.h"
 
 bool GLOBAL_QUIET = false;
 bool GLOBAL_DEBUG_ARGS = false;
 bool GLOBAL_DEBUG_PARSE = false;
 
+static const MyFlag FLAGS[] = {
+    {"--help",           FLAG_HELP,             NULL,            "show help"},
+    {"--quiet",          FLAG_QUIET,            NULL,            "disable dialog outputs"},
+    {"--oldenter",       FLAG_TYPEENTER,        NULL,            "enable old enter (a b c)"},
+    {"--testin",         FLAG_RUNTEST,          setTestFilename, "parametr: [file.txt] unittests from file"},
+    {"--debugargs",      FLAG_DEBUGARGS,        NULL,            "debug argparse"},
+    {"--debugparse",     FLAG_DEBUGPARSE,       NULL,            "debug parsing eq"},
+    {"--drawplot",       FLAG_DRAWPLOT,         NULL,            "draw a plot"},
+    {"--drawplotoffset", FLAG_DRAWPLOTOFFSET,   NULL,            "draw a plot by offsets"},
+    {"--signup",         FLAG_SIGNUP,           NULL,            "register a user"},
+    {"--randtests",      FLAG_RUNRANDOMTEST,    setNumTests,     "parametr: [num_tests] generate random tests"},
+    {"--seed",           FLAG_SETSEED,          setSeed,         "parametr: [seed] set seed"}
+};
+
+
 int main(const int argc, const char *argv[]) {
     runUnittests();
-    ArgValues values = parseArgs(argc, argv);
-    GLOBAL_QUIET = values.flags & FLAG_QUIET;
-    GLOBAL_DEBUG_ARGS = values.flags & FLAG_DEBUGARGS;
-    GLOBAL_DEBUG_PARSE = values.flags & FLAG_DEBUGPARSE;
-    if (values.flags & FLAG_SETSEED) {
+    ArgValues values = {.filename=NULL, .num_tests=0, .seed=42, .flags=0};
+    uint64_t flags = parseArgs(argc, argv, &values, STATIC_LEN(FLAGS), FLAGS);
+    if (flags & FLAG_HELP) {
+        printf("Usage:\n");
+        for (int i = 0; i < STATIC_LEN(FLAGS); i++) {
+            printf("%s: %s", FLAGS[i].name, FLAGS[i].usage);
+        }
+    }
+    GLOBAL_QUIET = flags & FLAG_QUIET;
+    GLOBAL_DEBUG_ARGS = flags & FLAG_DEBUGARGS;
+    GLOBAL_DEBUG_PARSE = flags & FLAG_DEBUGPARSE;
+    if (flags & FLAG_SETSEED) {
         srand(values.seed);
     }
-    if (values.flags & FLAG_RUNTEST) {
+    if (flags & FLAG_RUNTEST) {
         if (!runUnittestsFromFile(values.filename)) return MAINERRORS_FAILEDTESTS;
     }
-    if (values.flags & FLAG_RUNRANDOMTEST) {
+    if (flags & FLAG_RUNRANDOMTEST) {
         if (!runRandomTest(values.num_tests)) return MAINERRORS_FAILEDRANDOMTEST;
     }
-    if (values.flags & FLAG_SIGNUP) {
+    if (flags & FLAG_SIGNUP) {
         signup();
         return 0;
     }
     QUIET {
         printf("This not AI-generated reshalka\n");
-        coloredPrintf(WHITE, "POL");
-        coloredPrintf(BLUE, "TO");
-        coloredPrintf(RED, "RASHKA\n");
+        printf(WHITE "POL" BLUE "TO" RED "RASHKA\n" STANDART);
     }
     if (!signin())
         return MAINERRORS_FAILEDSIGNIN;
     SquareKoefs koefs = {NAN, NAN, NAN};
-    while (!getKoefs(&koefs, values.flags & FLAG_TYPEENTER)) {
+    while (!getKoefs(&koefs, flags & FLAG_TYPEENTER)) {
         double x1 = NAN, x2 = NAN;
         KSolves solution_type = solveSquare(koefs, &x1, &x2);
         printSolves(solution_type, x1, x2);
-        if (values.flags & FLAG_DRAWPLOT) {
+        if (flags & FLAG_DRAWPLOT) {
             drawPlot(koefs);
-        } else if (values.flags & FLAG_DRAWPLOTOFFSET) {
+        } else if (flags & FLAG_DRAWPLOTOFFSET) {
             drawPlotOffset(koefs);
         }
     }
@@ -63,13 +84,13 @@ int main(const int argc, const char *argv[]) {
 bool getKoefs(SquareKoefs *koefs, bool typeenter) {
     assert(koefs != NULL);
     if (typeenter) {
-        return getKoefsOld(koefs);
+        return getKoefsABC(koefs);
     }
-    return getKoefsNew(koefs);
+    return getKoefsParser(koefs);
 }
 
-// [[deprecated("This is old method, use getKoefs")]]
-bool getKoefsOld(SquareKoefs *koefs) {
+// [[deprecated("This is old method, use getKoefsParser")]]
+bool getKoefsABC(SquareKoefs *koefs) {
     assert(koefs != NULL); 
     QUIET printf("(old) enter a b c\n>>> ");
     int ch = 0;
@@ -84,7 +105,7 @@ bool getKoefsOld(SquareKoefs *koefs) {
     return 0;
 }
 
-bool getKoefsNew(SquareKoefs *koefs) {
+bool getKoefsParser(SquareKoefs *koefs) {
     assert(koefs != NULL); 
     char s_input[MAX_LEN] = {0};
     char s_result[MAX_LEN * 2] = {0};
@@ -261,7 +282,7 @@ bool runUnittest(TestCase test) {
         }
     }
     if (!passed) {
-        QUIET printf("FAILED solve: a: %lg b: %lg c: %lg, x1: %lg x2: %lg, x1_ref: %lg, x2_ref: %lg, solution_type: %d, solution_type_ref: %d\n",
+        QUIET printf(RED "FAILED" STANDART " solve: a: %lg b: %lg c: %lg, x1: %lg x2: %lg, x1_ref: %lg, x2_ref: %lg, solution_type: %d, solution_type_ref: %d\n",
                          test.koefs.a, test.koefs.b, test.koefs.c, 
                          x1, x2, test.x1, test.x2, 
                          solution_type, test.solution_type);
@@ -279,112 +300,35 @@ void runUnittests() {
 #endif
 }
 
-ArgValues parseArgs(int argc, char const *const *argv) {
+void setSeed(const int argc, const char *argv[], void *arg_values) {
     assert(argv != NULL);
-
-    ArgValues ans = {.filename=NULL, .num_tests=0, .seed=42, .flags=0};
-
-    int i = 1;
-    while (strncmp("--", argv[i], 2)) i++;
-
-    for (; i < argc; i++) {
-        const char *argv_per_flag[MAX_ARGS_PER_FLAG] = {0};
-        int argc_per_flag = 1;
-        argv_per_flag[0] = argv[i];
-
-        for (i++; i < argc; i++) {
-            if (argv[i][0] != '-') {
-                argv_per_flag[argc_per_flag] = argv[i];
-                argc_per_flag++;
-            } else {
-                i--;
-                break;
-            }
-        }
-        processFlagString(argc_per_flag, argv_per_flag, &ans);
-    }
-    return ans;
-}
-
-static const myFlag FLAGS[] = {
-    {"--quiet",          FLAG_QUIET,            NULL,    "disable dialog outputs"},
-    {"--oldenter",       FLAG_TYPEENTER,        NULL,    "enable old enter (a b c)"},
-    {"--testin",         FLAG_RUNTEST,          NULL,    "parametr: [file.txt] unittests from file"},
-    {"--debugargs",      FLAG_DEBUGARGS,        NULL,    "debug argparse"},
-    {"--debugparse",     FLAG_DEBUGPARSE,       NULL,    "debug parsing eq"},
-    {"--drawplot",       FLAG_DRAWPLOT,         NULL,    "draw a plot"},
-    {"--drawplotoffset", FLAG_DRAWPLOTOFFSET,   NULL,    "draw a plot by offsets"},
-    {"--signup",         FLAG_SIGNUP,           NULL,    "register a user"},
-    {"--randtests",      FLAG_RUNRANDOMTEST,    NULL,    "parametr: [num_tests] generate random tests"},
-    {"--seed",           FLAG_SETSEED,          NULL,    "parametr: [seed] set seed"}
-};
-
-// void setSeed(const int argc, const char *argv[]) {
-//     if (argc == 2) {
-//         srand((uint32_t)strtol(argv[1], NULL, 10));
-//     }
-// }
-
-void processFlagString(const int argc, char const *argv[], ArgValues* values) {
-    assert(argv != NULL);
-    assert(values != NULL);
-    MYDEBUGARGS {
-        printf("\n\n%s\nargs = %d\nargs = ", argv[0], argc);
-        for (int i = 1; i < argc; i++) {
-            printf("%s ", argv[i]);
-        }
-        putchar('\n');
-    }
-    if (!strcmp("--quiet", argv[0])) {
-        values->flags |= (1 << FLAG_QUIET);
-    } else if (!strcmp("--help", argv[0])) {
-        printf("Usage:\n"
-               "--quiet                     disable dialog outputs\n"
-               "--oldenter                  enable old enter (a b c)\n"
-               "--testin [file.txt]         unittests from file\n"
-               "--debugargs                 debug argparse\n"
-               "--debugparse                debug parsing eq\n"
-               "--drawplot                  draw a plot\n"
-               "--drawplotoffset            draw a plot by offsets\n"
-               "--signup                    register a user\n"
-               "--randtests [num_tests]     generate random tests\n"
-               "--seed [seed]               set seed\n");
-    } else if (!strcmp("--oldenter", argv[0])) {
-        values->flags |= FLAG_TYPEENTER;
-    } else if (!strcmp("--testin", argv[0])) {
-        if (argc == 2) {
-            values->flags |= FLAG_RUNTEST;
-            values->filename = argv[1];
-        }
-    } else if (!strcmp("--debugargs", argv[0])) {
-        values->flags |= FLAG_DEBUGARGS;
-    } else if (!strcmp("--debugparse", argv[0])) {
-        values->flags |= FLAG_DEBUGPARSE;
-    } else if (!strcmp("--drawplot", argv[0])) {
-        values->flags |= FLAG_DRAWPLOT;
-    } else if (!strcmp("--drawplotoffset", argv[0])) {
-        values->flags |= FLAG_DRAWPLOTOFFSET;
-    } else if (!strcmp("--signup", argv[0])) {
-        values->flags |= FLAG_SIGNUP;
-    } else if (!strcmp("--randtests", argv[0])) {
-        if (argc == 2) {
-            values->flags |= FLAG_RUNRANDOMTEST;
-            values->num_tests = strtol(argv[1], NULL, 10);
-        }
-    } else if (!strcmp("--seed", argv[0])) {
-        if (argc == 2) {
-            values->flags |= FLAG_SETSEED;
-            values->seed = (uint32_t)strtol(argv[1], NULL, 10);
-        }
+    assert(arg_values != NULL);
+    if (argc == 2) {
+        srand((uint32_t)strtol(argv[1], NULL, 10));
     }
 }
 
+void setTestFilename(const int argc, const char *argv[], void *arg_values) {
+    assert(argv != NULL);
+    assert(arg_values != NULL);
+    if (argc == 2) {
+        ((ArgValues*)arg_values)->filename = argv[1];
+    }
+}
+
+void setNumTests(const int argc, const char *argv[], void *arg_values) {
+    assert(argv != NULL);
+    assert(arg_values != NULL);
+    if (argc == 2) {
+        ((ArgValues*)arg_values)->num_tests = strtol(argv[1], NULL, 10);
+    }
+}
 
 bool runUnittestsFromFile(const char *filename) {
     assert(filename != NULL);
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
-        coloredPrintf(RED, "FILE DOESN'T EXIST\n");
+        printf(RED "FILE DOESN'T EXIST\n" STANDART);
         return false;
     }
     SquareKoefs koefs = {};
@@ -414,7 +358,7 @@ bool runUnittestsFromFile(const char *filename) {
         passed = passed && ans;
     }
     if (passed) {
-        coloredPrintf(GREEN, "Tests complete!\n");
+        printf(GREEN "Tests complete!\n" STANDART);
     }
     fclose(file);
     return passed;
@@ -456,7 +400,7 @@ bool runRandomTest(long num_tests) {
             return false;
         }
     }
-    QUIET coloredPrintf(GREEN, "RANDOM TEST PASSED\n");
+    QUIET printf(GREEN "RANDOM TEST PASSED\n" STANDART);
     return true;
 }
 

@@ -2,17 +2,14 @@
 #define _COLORS_H
 #include <stdint.h>
 
-enum COLORS {
-    BLACK = 30,
-    RED,
-    GREEN,
-    YELLOW,
-    BLUE,
-    PURPLE,
-    LIGHTBLUE,
-    WHITE,
-    STANDART = 39
-};
+#define BLACK     "\033[30m"
+#define RED       "\033[31m"
+#define GREEN     "\033[32m"
+#define YELLOW    "\033[33m"
+#define BLUE      "\033[34m"
+#define PURPLE    "\033[35m"
+#define LIGHTBLUE "\033[36m"
+#define WHITE     "\033[37m"
+#define STANDART  "\033[0m" 
 
-void coloredPrintf(uint8_t text_color, const char *s);
 #endif

@@ -4,6 +4,8 @@
 
 #define EPS 1e-9
 #define STATIC_STRLEN(s) (sizeof(s) - 1)
+#define STATIC_LEN(s) (int)sizeof(s) / (int)sizeof(s[0])
+
 #define STR2(x) #x
 #define STR(x) STR2(x) //TODO: спросить Деда
 

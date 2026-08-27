@@ -41,7 +41,7 @@ void signup() {
     printf("Repeat password\n>>> ");
     scanf("%" STR(MAX_LEN_PASSWORD) "s", password2);
     if (strcmp(password1, password2)) {
-        coloredPrintf(RED, "THEY MUST BE SAME!\n");
+        printf(RED "THEY MUST BE SAME!\n" STANDART);
         return;
     }
     uint64_t h1 = hash1(password1);
@@ -57,7 +57,7 @@ void signup() {
     uint64_t h2_temp = 0;
     while (fscanf(file, "%s %lu %lu", login_temp, &h1_temp, &h2_temp) == 3) { 
         if (!strcmp(login_temp, login)) {
-            coloredPrintf(RED, "Already in database\n");
+            printf(RED "Already in database\n" STANDART);
             return;
         }
         if (h1 == h1_temp && h2 == h2_temp) {
@@ -92,15 +92,15 @@ bool signin() {
     while (fscanf(file, "%s %lu %lu", login_temp, &h1_temp, &h2_temp) == 3) { 
         if (!strcmp(login_temp, login)) {
             if (h1 == h1_temp && h2 == h2_temp) {
-                coloredPrintf(GREEN, "CORRECT\n");
+                printf(GREEN "CORRECT\n" STANDART);
                 return true;
             } else {
-                coloredPrintf(RED, "UNCORRECT PASSWORD\n");
+                printf(RED "UNCORRECT PASSWORD\n" STANDART);
                 return false;
             }
         }
     }
-    coloredPrintf(RED, "Who are you? sing up!\n");
+    printf(RED "Who are you? sing up!\n" STANDART);
     fclose(file);
     return false;
 }
