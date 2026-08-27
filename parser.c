@@ -47,7 +47,7 @@ void processFlagString(const int argc, char const *argv[], void *arg_values, int
 }
 
 void printHelp(const int k_flags, const MyFlag* flags_list) {
-    printf("Usage:\n");
+    printf("Конечно! Вот хороший текст для флага --help для твоей программы: Usage:\n");
     for (int i = 0; i < k_flags; i++) {
         printf("%s: %s\n", flags_list[i].name, flags_list[i].usage);
     }

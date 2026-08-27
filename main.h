@@ -18,6 +18,11 @@
 #define SIZE_PLOT_Y 41 // размер графика
 #define SIZE_PLOT_X 121
 
+
+#define SIZE_GAME 6
+#define K_TARGETS_GAME 3
+
+
 typedef enum {
     ZERO_SOLVES,
     ONE_SOLVE,
@@ -38,9 +43,11 @@ typedef struct {
 typedef struct {
     const char* filename;
     long num_tests;
-    uint32_t seed;
-    uint64_t flags;
 } ArgValues; // структура для возвращаемых значений
+
+typedef struct {
+    int y, x;
+} Point;
 
 enum FLAG_BYTES {
     FLAG_QUIET = (1U << 0), 
@@ -53,7 +60,8 @@ enum FLAG_BYTES {
     FLAG_DRAWPLOT = (1U << 7),
     FLAG_DRAWPLOTOFFSET = (1U << 8),
     FLAG_SETSEED = (1U << 9),
-    FLAG_HELP = (1U << 10)
+    FLAG_HELP = (1U << 10),
+    FLAG_GAME = (1U << 11)
 };
 
 enum MAINERRORS {
@@ -111,5 +119,11 @@ bool checkTestAnswer(SquareKoefs koefs, KSolves solution_type_ans, double x1, do
 void setSeed(const int argc, const char *argv[], void *arg_values);
 void setTestFilename(const int argc, const char *argv[], void *arg_values);
 void setNumTests(const int argc, const char *argv[], void *arg_values);
+
+// функция вывода поля на экран
+void printFeel(char feel[SIZE_GAME][SIZE_GAME]);
+
+// функция запуска игры
+void startGame();
 
 #endif

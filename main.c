@@ -30,14 +30,14 @@ static const MyFlag FLAGS[] = {
     {"--drawplotoffset", FLAG_DRAWPLOTOFFSET,   NULL,            "draw a plot by offsets"},
     {"--signup",         FLAG_SIGNUP,           NULL,            "register a user"},
     {"--randtests",      FLAG_RUNRANDOMTEST,    setNumTests,     "parametr: [num_tests] generate random tests"},
-    {"--seed",           FLAG_SETSEED,          setSeed,         "parametr: [seed] set seed"}
+    {"--seed",           FLAG_SETSEED,          setSeed,         "parametr: [seed] set seed"},
+    {"--game",           FLAG_GAME,             NULL,            "run a game to enter"}
 };
-
 
 int main(const int argc, const char *argv[]) {
     runUnittests();
 
-    ArgValues values = {.filename=NULL, .num_tests=0, .seed=42, .flags=0};
+    ArgValues values = {.filename=NULL, .num_tests=0};
     uint64_t flags = parseArgs(argc, argv, &values, STATIC_LEN(FLAGS), FLAGS);
     if (flags & FLAG_HELP) {
         printHelp(STATIC_LEN(FLAGS), FLAGS);
@@ -45,10 +45,7 @@ int main(const int argc, const char *argv[]) {
 
     GLOBAL_QUIET = flags & FLAG_QUIET;
     GLOBAL_DEBUG_ARGS = flags & FLAG_DEBUGARGS;
-    GLOBAL_DEBUG_PARSE = flags & FLAG_DEBUGPARSE;
-    if (flags & FLAG_SETSEED) {
-        srand(values.seed);
-    }
+    GLOBAL_DEBUG_PARSE = flags & FLAG_DEBUGPARSE; 
     if (flags & FLAG_RUNTEST) {
         if (!runUnittestsFromFile(values.filename)) return MAINERRORS_FAILEDTESTS;
     }
@@ -58,6 +55,9 @@ int main(const int argc, const char *argv[]) {
     if (flags & FLAG_SIGNUP) {
         signup();
         return 0;
+    }
+    if (flags & FLAG_GAME) {
+        startGame();
     }
 
 
@@ -74,6 +74,7 @@ int main(const int argc, const char *argv[]) {
         double x1 = NAN, x2 = NAN;
         KSolves solution_type = solveSquare(koefs, &x1, &x2);
         printSolves(solution_type, x1, x2);
+
         if (flags & FLAG_DRAWPLOT) {
             drawPlot(koefs);
         } else if (flags & FLAG_DRAWPLOTOFFSET) {
@@ -328,6 +329,7 @@ void setSeed(const int argc, const char *argv[], void *arg_values) {
     assert(arg_values != NULL);
 
     if (argc == 2) {
+        QUIET printf("setted seed: %u\n", (uint32_t)strtol(argv[1], NULL, 10));\
         srand((uint32_t)strtol(argv[1], NULL, 10));
     }
 }
@@ -425,6 +427,7 @@ bool runRandomTest(long num_tests) {
             x1_ref = x2_ref;
             x2_ref = temp;
         }
+
         koefs.a = randDouble();
         koefs.b = -koefs.a * (x1_ref + x2_ref);
         koefs.c = x1_ref * x2_ref * koefs.a;
@@ -567,3 +570,62 @@ void drawPlot(SquareKoefs koefs) {
         printf("%.*s\n", SIZE_PLOT_X, plot[i]);
     }
 }
+
+void printFeel(char feel[SIZE_GAME][SIZE_GAME]) {
+    if (SIZE_GAME <= 10) {
+        printf("    ");
+        for (int i = 0; i < SIZE_GAME; i++) printf("%d", i);
+        printf("\n");
+    }
+    for (int i = 0; i < SIZE_GAME; i++) {
+        printf("%3d %.*s\n", i, SIZE_GAME, feel[i]);
+    }
+}
+
+// в планах может быть внести это в маин через iterGame(x1, x2)
+void startGame() {
+    printf("Let`s play: enter a square eq, and abs(roots) will be coords to attack\n");
+
+    char feel[SIZE_GAME][SIZE_GAME] = {}; 
+    memset(feel, '.', sizeof feel);
+    Point targets[K_TARGETS_GAME] = {};
+
+    for (int i = 0; i < K_TARGETS_GAME; i++) {
+        targets[i] = (Point){rand() % SIZE_GAME, rand() % SIZE_GAME};
+        feel[targets[i].y][targets[i].x] = 'O';
+    }
+
+    printFeel(feel);
+ 
+    int k_targets_left = K_TARGETS_GAME;
+    SquareKoefs koefs = {NAN, NAN, NAN};
+    while (k_targets_left && !getKoefsABC(&koefs)) {
+        double x1_double = NAN, x2_double = NAN;
+        KSolves solution_type = solveSquare(koefs, &x1_double, &x2_double);
+        if (solution_type != TWO_SOLVES) {
+            printf("you should enter a eq with 2 solutions\n");
+            continue;
+        }
+        
+        int x1 = (int)fabs(x1_double), x2 = (int)fabs(x2_double);
+
+        printSolves(solution_type, x1, x2);
+
+        if (x1 >= SIZE_GAME || x2 >= SIZE_GAME) continue;
+
+        feel[x1][x2] = 'X';
+        feel[x2][x1] = 'X';
+
+        for (int i = 0; i < K_TARGETS_GAME; i++) {
+            if (x1 == targets[i].x && x2 == targets[i].y) {
+                printf("Striked! Targets_left: %d\n", --k_targets_left);
+            }
+            if (x1 == targets[i].y && x2 == targets[i].x) {
+                printf("Striked! Targets_left: %d\n", --k_targets_left);
+            }
+        }
+
+        printFeel(feel);
+    }
+}
+
