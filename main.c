@@ -36,14 +36,13 @@ static const MyFlag FLAGS[] = {
 
 int main(const int argc, const char *argv[]) {
     runUnittests();
+
     ArgValues values = {.filename=NULL, .num_tests=0, .seed=42, .flags=0};
     uint64_t flags = parseArgs(argc, argv, &values, STATIC_LEN(FLAGS), FLAGS);
     if (flags & FLAG_HELP) {
-        printf("Usage:\n");
-        for (int i = 0; i < STATIC_LEN(FLAGS); i++) {
-            printf("%s: %s", FLAGS[i].name, FLAGS[i].usage);
-        }
+        printHelp(STATIC_LEN(FLAGS), FLAGS);
     }
+
     GLOBAL_QUIET = flags & FLAG_QUIET;
     GLOBAL_DEBUG_ARGS = flags & FLAG_DEBUGARGS;
     GLOBAL_DEBUG_PARSE = flags & FLAG_DEBUGPARSE;
@@ -60,12 +59,16 @@ int main(const int argc, const char *argv[]) {
         signup();
         return 0;
     }
+
+
     QUIET {
         printf("This not AI-generated reshalka\n");
         printf(WHITE "POL" BLUE "TO" RED "RASHKA\n" STANDART);
     }
+
     if (!signin())
         return MAINERRORS_FAILEDSIGNIN;
+
     SquareKoefs koefs = {NAN, NAN, NAN};
     while (!getKoefs(&koefs, flags & FLAG_TYPEENTER)) {
         double x1 = NAN, x2 = NAN;
@@ -77,21 +80,25 @@ int main(const int argc, const char *argv[]) {
             drawPlotOffset(koefs);
         }
     }
+
     QUIET printf("Bye bye! ;)\n");
     return 0;
 }
 
 bool getKoefs(SquareKoefs *koefs, bool typeenter) {
     assert(koefs != NULL);
+
     if (typeenter) {
         return getKoefsABC(koefs);
     }
+
     return getKoefsParser(koefs);
 }
 
 // [[deprecated("This is old method, use getKoefsParser")]]
 bool getKoefsABC(SquareKoefs *koefs) {
     assert(koefs != NULL); 
+
     QUIET printf("(old) enter a b c\n>>> ");
     int ch = 0;
     while (scanf("%lg %lg %lg", &(koefs->a), &(koefs->b), &(koefs->c)) != 3) {
@@ -101,12 +108,14 @@ bool getKoefsABC(SquareKoefs *koefs) {
         }
         QUIET printf("NO. enter a b c\n>>> ");
     }
+
     clearInputBuffer();
     return 0;
 }
 
 bool getKoefsParser(SquareKoefs *koefs) {
     assert(koefs != NULL); 
+
     char s_input[MAX_LEN] = {0};
     char s_result[MAX_LEN * 2] = {0};
     int result_index = 1;
@@ -115,6 +124,7 @@ bool getKoefsParser(SquareKoefs *koefs) {
         fgets(s_input, MAX_LEN, stdin);
         if (strchr(s_input, 'q') != NULL)
             return true;
+
         result_index = 0;
         for (int input_index = 0; s_input[input_index] != '\0'; input_index++) {
             if (s_input[input_index] != ' ' && s_input[input_index] != '\n') {
@@ -129,6 +139,7 @@ bool getKoefsParser(SquareKoefs *koefs) {
         s_result[result_index] = '+';
     } while (result_index == 0 || parseKoefs(s_result, koefs) ||
         !(isfinite(koefs->a) && isfinite(koefs->b) && isfinite(koefs->c)));
+
     printf("START SOLVING...\n");
     return false;
 }
@@ -136,7 +147,9 @@ bool getKoefsParser(SquareKoefs *koefs) {
 bool parseKoefs(char *s_input, SquareKoefs *koefs) {
     assert(s_input != NULL);
     assert(koefs != NULL);
+
     MYDEBUGPARSE printf("get: %s\n\n", s_input);
+
     double a_sum = 0, b_sum = 0, c_sum = 0;
     int8_t sign = 1;
     static const char square_plus[] = "x^2+";
@@ -151,7 +164,9 @@ bool parseKoefs(char *s_input, SquareKoefs *koefs) {
             num_now = 1;
         }
         s_input = parse_end;
+
         MYDEBUGPARSE printf("s: %s, temp: %lg, mn: %d, a b c: %lg %lg %lg\n", s_input, num_now, sign, a_sum, b_sum, c_sum);
+
         if (!strncmp(s_input, square_plus, STATIC_STRLEN(square_plus))) {
             a_sum += num_now * sign;
             s_input += STATIC_STRLEN(square_plus);
@@ -171,6 +186,7 @@ bool parseKoefs(char *s_input, SquareKoefs *koefs) {
             MYDEBUGPARSE printf("s: %s, a b c: %lg %lg %lg\n", s_input, koefs->a, koefs->b, koefs->c);
             return 1;
         }
+
         if (*s_input == '=') {
             if (sign < 0)
                 return 1;
@@ -180,10 +196,13 @@ bool parseKoefs(char *s_input, SquareKoefs *koefs) {
                 s_input++;
         }
     } while (*s_input != '\0');
+
     koefs->a = a_sum;
     koefs->b = b_sum;
     koefs->c = c_sum;
+
     MYDEBUGPARSE printf("a b c: %lg %lg %lg\n", koefs->a, koefs->b, koefs->c);
+
     return 0;
 }
 
@@ -191,11 +210,13 @@ KSolves solveLinear(double k, double b, double *x) {
     assert(isfinite(k));
     assert(isfinite(b));
     assert(x != NULL);
+
     if (isZero(k)) {
         if (isZero(b))
             return INF_SOLVES;
         return ZERO_SOLVES;
     }
+
     *x = -b / k;
     return ONE_SOLVE;
 }
@@ -249,6 +270,7 @@ void printSolves(KSolves solution_type, double x1, double x2) {
 bool runTest(SquareKoefs koefs) {
     double x1 = NAN, x2 = NAN;
     KSolves solution_type = solveSquare(koefs, &x1, &x2);
+
     if (!checkTestAnswer(koefs, solution_type, x1, x2)) {
         QUIET printf("FAILED solve: a: %lg b: %lg c: %lg, x1: %lg x2: %lg\n",
                          koefs.a, koefs.b, koefs.c, x1, x2);
@@ -281,6 +303,7 @@ bool runUnittest(TestCase test) {
             assert(false);
         }
     }
+
     if (!passed) {
         QUIET printf(RED "FAILED" STANDART " solve: a: %lg b: %lg c: %lg, x1: %lg x2: %lg, x1_ref: %lg, x2_ref: %lg, solution_type: %d, solution_type_ref: %d\n",
                          test.koefs.a, test.koefs.b, test.koefs.c, 
@@ -303,6 +326,7 @@ void runUnittests() {
 void setSeed(const int argc, const char *argv[], void *arg_values) {
     assert(argv != NULL);
     assert(arg_values != NULL);
+
     if (argc == 2) {
         srand((uint32_t)strtol(argv[1], NULL, 10));
     }
@@ -311,6 +335,7 @@ void setSeed(const int argc, const char *argv[], void *arg_values) {
 void setTestFilename(const int argc, const char *argv[], void *arg_values) {
     assert(argv != NULL);
     assert(arg_values != NULL);
+
     if (argc == 2) {
         ((ArgValues*)arg_values)->filename = argv[1];
     }
@@ -319,6 +344,7 @@ void setTestFilename(const int argc, const char *argv[], void *arg_values) {
 void setNumTests(const int argc, const char *argv[], void *arg_values) {
     assert(argv != NULL);
     assert(arg_values != NULL);
+
     if (argc == 2) {
         ((ArgValues*)arg_values)->num_tests = strtol(argv[1], NULL, 10);
     }
@@ -326,11 +352,13 @@ void setNumTests(const int argc, const char *argv[], void *arg_values) {
 
 bool runUnittestsFromFile(const char *filename) {
     assert(filename != NULL);
+
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
         printf(RED "FILE DOESN'T EXIST\n" STANDART);
         return false;
     }
+
     SquareKoefs koefs = {};
     char solution_type_char = 0;
     bool passed = true;
@@ -357,6 +385,7 @@ bool runUnittestsFromFile(const char *filename) {
         bool ans = runUnittest((TestCase) {(SquareKoefs) koefs, solution_type_ref, x1, x2});
         passed = passed && ans;
     }
+
     if (passed) {
         printf(GREEN "Tests complete!\n" STANDART);
     }
@@ -376,6 +405,8 @@ bool runRandomTest(long num_tests) {
             return false;
         }
     }
+
+
     koefs.a = 0;
     for (int i = 0; i < num_tests; i++) {
         koefs.b = randDouble();
@@ -384,6 +415,8 @@ bool runRandomTest(long num_tests) {
             return false;
         }
     }
+
+
     for (int i = 0; i < num_tests; i++) {
         x1_ref = randDouble();
         x2_ref = randDouble();
@@ -400,6 +433,7 @@ bool runRandomTest(long num_tests) {
             return false;
         }
     }
+
     QUIET printf(GREEN "RANDOM TEST PASSED\n" STANDART);
     return true;
 }
@@ -448,15 +482,20 @@ void drawPlotOffset(SquareKoefs koefs) {
     assert(isfinite(koefs.a));
     assert(isfinite(koefs.b));
     assert(isfinite(koefs.c));
+
     char plot[SIZE_PLOT_Y][SIZE_PLOT_X] = {}; 
     memset(plot, ' ', sizeof plot);
+
     for (int i = 0; i < SIZE_PLOT_X; i++) {
         plot[SIZE_PLOT_Y / 2][i] = '-';
     }
     for (int i = 0; i < SIZE_PLOT_Y; i++) {
         plot[i][SIZE_PLOT_X / 2] = '|';
     }
+
     plot[SIZE_PLOT_Y / 2][SIZE_PLOT_X / 2] = '+';
+    plot[0][SIZE_PLOT_X / 2] = 'y';
+    plot[SIZE_PLOT_Y / 2][SIZE_PLOT_X - 1] = 'x';
 
     double stepx = 5, stepy = 0.4, offsetx = 0, offsety = 0;
     if (isZero(koefs.a)) {
@@ -485,15 +524,20 @@ void drawPlot(SquareKoefs koefs) {
     assert(isfinite(koefs.a));
     assert(isfinite(koefs.b));
     assert(isfinite(koefs.c));
+
     char plot[SIZE_PLOT_Y][SIZE_PLOT_X] = {}; 
     memset(plot, ' ', sizeof plot);
+
     for (int i = 0; i < SIZE_PLOT_X; i++) {
         plot[SIZE_PLOT_Y / 2][i] = '-';
     }
     for (int i = 0; i < SIZE_PLOT_Y; i++) {
         plot[i][SIZE_PLOT_X / 2] = '|';
     }
+
     plot[SIZE_PLOT_Y / 2][SIZE_PLOT_X / 2] = '+';
+    plot[0][SIZE_PLOT_X / 2] = 'y';
+    plot[SIZE_PLOT_Y / 2][SIZE_PLOT_X - 1] = 'x';
 
     double stepx = 5, stepy = 0.4;
     if (isZero(koefs.a)) {

@@ -4,118 +4,112 @@
 \DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ \_MAIN\_H}}
 \DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ \_MAIN\_H}}
 \DoxyCodeLine{00003\ }
-\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}colors.h"{}}}
-\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ "{}hash.h"{}}}
-\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <assert.h>}}
-\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <curses.h>}}
-\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ <math.h>}}
-\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
-\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
-\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
-\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
-\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#include\ <string.h>}}
-\DoxyCodeLine{00014\ }
-\DoxyCodeLine{00015\ }
-\DoxyCodeLine{00016\ \textcolor{comment}{//\ \#define\ quietColoredPrintf(color,\ smth)\ if\ (!GLOBAL\_QUIET)\ coloredPrintf(color,\ smth)}}
-\DoxyCodeLine{00017\ \textcolor{comment}{//\ \#define\ quietPrintf(smth)\ if\ (!GLOBAL\_QUIET)\ printf(smth)\ \ \ \ //\ old\ version}}
-\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#define\ QUIET\ if\ (!GLOBAL\_QUIET)\ }}
-\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ myassert(esp)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
-\DoxyCodeLine{00020\ \textcolor{preprocessor}{\ \ \ \ if\ (!(esp))\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
-\DoxyCodeLine{00021\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ fprintf(stderr,\ "{}ASSSSSERT:\ \%s!\ line:\ \%d,\ file:\ \%s,\ func:\ \%s\(\backslash\)n"{},\ \#esp,\ \(\backslash\)}}
-\DoxyCodeLine{00022\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_\_LINE\_\_,\ \_\_FILE\_\_,\ \_\_func\_\_);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
-\DoxyCodeLine{00023\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ abort();\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
-\DoxyCodeLine{00024\ \textcolor{preprocessor}{\ \ \ \ \}}}
-\DoxyCodeLine{00025\ \ }
-\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#define\ MAX\_ARGS\_PER\_FLAG\ 10\ }\textcolor{comment}{//\ максимальное\ количество\ аргументов\ у\ флага\ из\ командной\ строки}}
-\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#define\ MAX\_LEN\ 100}}
-\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#define\ SIZE\_PLOT\_Y\ 41}}
-\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#define\ SIZE\_PLOT\_X\ 121}}
-\DoxyCodeLine{00030\ }
-\DoxyCodeLine{00031\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}\ \{}
-\DoxyCodeLine{00032\ \ \ \ \ ZERO\_SOLVES,}
-\DoxyCodeLine{00033\ \ \ \ \ ONE\_SOLVE,}
-\DoxyCodeLine{00034\ \ \ \ \ TWO\_SOLVES,}
-\DoxyCodeLine{00035\ \ \ \ \ INF\_SOLVES}
-\DoxyCodeLine{00036\ \}\ KSolves;}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{comment}{//\ \#define\ quietColoredPrintf(color,\ smth)\ if\ (!GLOBAL\_QUIET)\ coloredPrintf(color,\ smth)}}
+\DoxyCodeLine{00008\ \textcolor{comment}{//\ \#define\ quietPrintf(smth)\ if\ (!GLOBAL\_QUIET)\ printf(smth)\ \ \ \ //\ another\ version}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#define\ QUIET\ if\ (!GLOBAL\_QUIET)\ }}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#define\ myassert(esp)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\ \ \ \ if\ (!(esp))\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ fprintf(stderr,\ "{}ASSSSSERT:\ \%s!\ line:\ \%d,\ file:\ \%s,\ func:\ \%s\(\backslash\)n"{},\ \#esp,\ \(\backslash\)}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_\_LINE\_\_,\ \_\_FILE\_\_,\ \_\_func\_\_);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ abort();\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\ \ \ \ \}}}
+\DoxyCodeLine{00016\ \ }
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ MAX\_LEN\ 100\ }\textcolor{comment}{//\ максимальная\ длина\ вводимого\ уравнения}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#define\ SIZE\_PLOT\_Y\ 41\ }\textcolor{comment}{//\ размер\ графика}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ SIZE\_PLOT\_X\ 121}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}\ \{}
+\DoxyCodeLine{00022\ \ \ \ \ ZERO\_SOLVES,}
+\DoxyCodeLine{00023\ \ \ \ \ ONE\_SOLVE,}
+\DoxyCodeLine{00024\ \ \ \ \ TWO\_SOLVES,}
+\DoxyCodeLine{00025\ \ \ \ \ INF\_SOLVES}
+\DoxyCodeLine{00026\ \}\ KSolves;}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keywordtype}{double}\ a,\ b,\ c;}
+\DoxyCodeLine{00030\ \}\ \doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}};}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00033\ \ \ \ \ \doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}\ koefs;}
+\DoxyCodeLine{00034\ \ \ \ \ KSolves\ solution\_type;}
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keywordtype}{double}\ x1,\ x2;}
+\DoxyCodeLine{00036\ \}\ \doxymbox{\hyperlink{structTestCase}{TestCase}};}
 \DoxyCodeLine{00037\ }
 \DoxyCodeLine{00038\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
-\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keywordtype}{double}\ a,\ b,\ c;}
-\DoxyCodeLine{00040\ \}\ \doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}};}
-\DoxyCodeLine{00041\ }
-\DoxyCodeLine{00042\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
-\DoxyCodeLine{00043\ \ \ \ \ \doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}\ koefs;}
-\DoxyCodeLine{00044\ \ \ \ \ KSolves\ solution\_type;}
-\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keywordtype}{double}\ x1,\ x2;}
-\DoxyCodeLine{00046\ \}\ \doxymbox{\hyperlink{structTestCase}{TestCase}};}
-\DoxyCodeLine{00047\ }
-\DoxyCodeLine{00048\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
-\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ filename;}
-\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordtype}{long}\ num\_tests;}
-\DoxyCodeLine{00051\ \ \ \ \ uint32\_t\ seed;}
-\DoxyCodeLine{00052\ \ \ \ \ uint64\_t\ flags;}
-\DoxyCodeLine{00053\ \}\ \doxymbox{\hyperlink{structArgValues}{ArgValues}};}
-\DoxyCodeLine{00054\ }
-\DoxyCodeLine{00055\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
-\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ name;\ }
-\DoxyCodeLine{00057\ \ \ \ \ uint64\_t\ mask;}
-\DoxyCodeLine{00058\ \ \ \ \ void\ (*function)(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ argc,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *argv[]);}
-\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ usage;\ }
-\DoxyCodeLine{00060\ \}\ \doxymbox{\hyperlink{structmyFlag}{myFlag}};}
-\DoxyCodeLine{00061\ }
-\DoxyCodeLine{00062\ }
-\DoxyCodeLine{00063\ \textcolor{keyword}{enum}\ FLAG\_BYTES\ \{}
-\DoxyCodeLine{00064\ \ \ \ \ FLAG\_QUIET\ =\ (1U\ <<\ 0),\ }
-\DoxyCodeLine{00065\ \ \ \ \ FLAG\_TYPEENTER\ =\ (1U\ <<\ 1),\ }
-\DoxyCodeLine{00066\ \ \ \ \ FLAG\_RUNTEST\ =\ (1U\ <<\ 2),\ }
-\DoxyCodeLine{00067\ \ \ \ \ FLAG\_DEBUGARGS\ =\ (1U\ <<\ 3),\ }
-\DoxyCodeLine{00068\ \ \ \ \ FLAG\_DEBUGPARSE\ =\ (1U\ <<\ 4),\ }
-\DoxyCodeLine{00069\ \ \ \ \ FLAG\_SIGNUP\ =\ (1U\ <<\ 5),\ }
-\DoxyCodeLine{00070\ \ \ \ \ FLAG\_RUNRANDOMTEST\ =\ (1U\ <<\ 6),}
-\DoxyCodeLine{00071\ \ \ \ \ FLAG\_DRAWPLOT\ =\ (1U\ <<\ 7),}
-\DoxyCodeLine{00072\ \ \ \ \ FLAG\_DRAWPLOTOFFSET\ =\ (1U\ <<\ 8),}
-\DoxyCodeLine{00073\ \ \ \ \ FLAG\_SETSEED\ =\ (1U\ <<\ 9)}
-\DoxyCodeLine{00074\ \};}
-\DoxyCodeLine{00075\ }
-\DoxyCodeLine{00076\ }
-\DoxyCodeLine{00077\ \textcolor{comment}{//\ enum\ FLAG\_BYTES\ \{}}
-\DoxyCodeLine{00078\ \textcolor{comment}{//\ \ \ \ \ FLAG\_QUIET\ =\ 0,\ }}
-\DoxyCodeLine{00079\ \textcolor{comment}{//\ \ \ \ \ FLAG\_TYPEENTER,\ }}
-\DoxyCodeLine{00080\ \textcolor{comment}{//\ \ \ \ \ FLAG\_TESTFAILED,\ }}
-\DoxyCodeLine{00081\ \textcolor{comment}{//\ \ \ \ \ FLAG\_DEBUGARGS,\ }}
-\DoxyCodeLine{00082\ \textcolor{comment}{//\ \ \ \ \ FLAG\_DEBUGPARSE,\ }}
-\DoxyCodeLine{00083\ \textcolor{comment}{//\ \ \ \ \ FLAG\_SIGNUP,\ }}
-\DoxyCodeLine{00084\ \textcolor{comment}{//\ \ \ \ \ FLAG\_RANDOMTESTFAILED,}}
-\DoxyCodeLine{00085\ \textcolor{comment}{//\ \ \ \ \ FLAG\_DRAWPLOT,}}
-\DoxyCodeLine{00086\ \textcolor{comment}{//\ \ \ \ \ FLAG\_DRAWPLOTOFFSET}}
-\DoxyCodeLine{00087\ \textcolor{comment}{//\ \};\ \ \ //\ old}}
-\DoxyCodeLine{00088\ }
-\DoxyCodeLine{00089\ \textcolor{keyword}{enum}\ MAINERRORS\ \{}
-\DoxyCodeLine{00090\ \ \ \ \ MAINERRORS\_FAILEDTESTS\ =\ 67,}
-\DoxyCodeLine{00091\ \ \ \ \ MAINERRORS\_FAILEDRANDOMTEST,}
-\DoxyCodeLine{00092\ \ \ \ \ MAINERRORS\_FAILEDSIGNIN}
-\DoxyCodeLine{00093\ \};}
-\DoxyCodeLine{00094\ }
-\DoxyCodeLine{00099\ \textcolor{keywordtype}{void}\ runUnittests();}
-\DoxyCodeLine{00100\ \textcolor{keywordtype}{bool}\ runUnittest(\doxymbox{\hyperlink{structTestCase}{TestCase}}\ test);}
-\DoxyCodeLine{00101\ \textcolor{keywordtype}{bool}\ runTest(\doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}\ koefs);}
-\DoxyCodeLine{00102\ \textcolor{keywordtype}{bool}\ runUnittestsFromFile(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *filename);}
-\DoxyCodeLine{00103\ }
-\DoxyCodeLine{00110\ \doxymbox{\hyperlink{structArgValues}{ArgValues}}\ parseArgs(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}\ *\textcolor{keyword}{const}\ *argv);}
-\DoxyCodeLine{00112\ \textcolor{keywordtype}{void}\ processFlagString(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}\ *argv[],\ \doxymbox{\hyperlink{structArgValues}{ArgValues}}\ *values);}
-\DoxyCodeLine{00113\ \textcolor{keywordtype}{bool}\ getKoefsOld(\doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}*\ koefs);}
-\DoxyCodeLine{00114\ \textcolor{keywordtype}{bool}\ getKoefsNew(\doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}\ *koefs);}
-\DoxyCodeLine{00115\ \textcolor{keywordtype}{bool}\ parseKoefs(\textcolor{keywordtype}{char}\ *s,\ \doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}\ *koefs);}
-\DoxyCodeLine{00116\ \textcolor{keywordtype}{bool}\ getKoefs(\doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}\ *koefs,\ \textcolor{keywordtype}{bool}\ typeenter);}
-\DoxyCodeLine{00117\ KSolves\ solveLinear(\textcolor{keywordtype}{double}\ k,\ \textcolor{keywordtype}{double}\ b,\ \textcolor{keywordtype}{double}\ *x);}
-\DoxyCodeLine{00118\ KSolves\ solveSquare(\doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}\ koefs,\ \textcolor{keywordtype}{double}\ *x1,\ \textcolor{keywordtype}{double}\ *x2);}
-\DoxyCodeLine{00119\ \textcolor{keywordtype}{void}\ printSolves(KSolves\ solution\_type,\ \textcolor{keywordtype}{double}\ x1,\ \textcolor{keywordtype}{double}\ x2);}
-\DoxyCodeLine{00120\ \textcolor{keywordtype}{double}\ countEq(\doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}\ koefs,\ \textcolor{keywordtype}{double}\ x);}
-\DoxyCodeLine{00121\ \textcolor{keywordtype}{bool}\ runRandomTest(\textcolor{keywordtype}{long}\ num\_tests);}
-\DoxyCodeLine{00122\ \textcolor{keywordtype}{void}\ drawPlot(\doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}\ koefs);}
-\DoxyCodeLine{00123\ \textcolor{keywordtype}{void}\ drawPlotOffset(\doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}\ koefs);}
-\DoxyCodeLine{00124\ KSolves\ getRightSolutionType(\doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}\ koefs);}
-\DoxyCodeLine{00125\ \textcolor{keywordtype}{bool}\ checkTestAnswer(\doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}\ koefs,\ KSolves\ solution\_type\_ans,\ \textcolor{keywordtype}{double}\ x1,\ \textcolor{keywordtype}{double}\ x2);}
-\DoxyCodeLine{00126\ }
-\DoxyCodeLine{00127\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ filename;}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keywordtype}{long}\ num\_tests;}
+\DoxyCodeLine{00041\ \ \ \ \ uint32\_t\ seed;}
+\DoxyCodeLine{00042\ \ \ \ \ uint64\_t\ flags;}
+\DoxyCodeLine{00043\ \}\ \doxymbox{\hyperlink{structArgValues}{ArgValues}};\ \textcolor{comment}{//\ структура\ для\ возвращаемых\ значений}}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \textcolor{keyword}{enum}\ FLAG\_BYTES\ \{}
+\DoxyCodeLine{00046\ \ \ \ \ FLAG\_QUIET\ =\ (1U\ <<\ 0),\ }
+\DoxyCodeLine{00047\ \ \ \ \ FLAG\_TYPEENTER\ =\ (1U\ <<\ 1),\ }
+\DoxyCodeLine{00048\ \ \ \ \ FLAG\_RUNTEST\ =\ (1U\ <<\ 2),\ }
+\DoxyCodeLine{00049\ \ \ \ \ FLAG\_DEBUGARGS\ =\ (1U\ <<\ 3),\ }
+\DoxyCodeLine{00050\ \ \ \ \ FLAG\_DEBUGPARSE\ =\ (1U\ <<\ 4),\ }
+\DoxyCodeLine{00051\ \ \ \ \ FLAG\_SIGNUP\ =\ (1U\ <<\ 5),\ }
+\DoxyCodeLine{00052\ \ \ \ \ FLAG\_RUNRANDOMTEST\ =\ (1U\ <<\ 6),}
+\DoxyCodeLine{00053\ \ \ \ \ FLAG\_DRAWPLOT\ =\ (1U\ <<\ 7),}
+\DoxyCodeLine{00054\ \ \ \ \ FLAG\_DRAWPLOTOFFSET\ =\ (1U\ <<\ 8),}
+\DoxyCodeLine{00055\ \ \ \ \ FLAG\_SETSEED\ =\ (1U\ <<\ 9),}
+\DoxyCodeLine{00056\ \ \ \ \ FLAG\_HELP\ =\ (1U\ <<\ 10)}
+\DoxyCodeLine{00057\ \};}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \textcolor{keyword}{enum}\ MAINERRORS\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ MAINERRORS\_FAILEDTESTS\ =\ 67,}
+\DoxyCodeLine{00061\ \ \ \ \ MAINERRORS\_FAILEDRANDOMTEST,}
+\DoxyCodeLine{00062\ \ \ \ \ MAINERRORS\_FAILEDSIGNIN}
+\DoxyCodeLine{00063\ \};}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \textcolor{comment}{//\ Функция\ запуска\ юнит\ тестов}}
+\DoxyCodeLine{00066\ \textcolor{keywordtype}{void}\ runUnittests();}
+\DoxyCodeLine{00067\ \textcolor{comment}{//\ запуск\ одного\ юнит\ теста}}
+\DoxyCodeLine{00068\ \textcolor{keywordtype}{bool}\ runUnittest(\doxymbox{\hyperlink{structTestCase}{TestCase}}\ test);}
+\DoxyCodeLine{00069\ \textcolor{comment}{//\ запуск\ теста\ с\ проверкой\ постановкой}}
+\DoxyCodeLine{00070\ \textcolor{keywordtype}{bool}\ runTest(\doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}\ koefs);}
+\DoxyCodeLine{00071\ \textcolor{comment}{//\ юнит\ тесты\ из\ файла}}
+\DoxyCodeLine{00072\ \textcolor{keywordtype}{bool}\ runUnittestsFromFile(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *filename);}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00079\ \textcolor{keywordtype}{bool}\ getKoefsABC(\doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}*\ koefs);}
+\DoxyCodeLine{00080\ \textcolor{comment}{//\ ввод\ уравнения\ с\ парсером}}
+\DoxyCodeLine{00081\ \textcolor{keywordtype}{bool}\ getKoefsParser(\doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}\ *koefs);}
+\DoxyCodeLine{00082\ \textcolor{comment}{//\ парсер\ коэффициентов\ из\ преобразованной\ строки}}
+\DoxyCodeLine{00083\ \textcolor{keywordtype}{bool}\ parseKoefs(\textcolor{keywordtype}{char}\ *s,\ \doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}\ *koefs);}
+\DoxyCodeLine{00084\ \textcolor{comment}{//\ ввод\ коэффициентов,\ запускает\ getKoefsABC\ или\ getKoefsParser\ по\ флагу\ }}
+\DoxyCodeLine{00085\ \textcolor{keywordtype}{bool}\ getKoefs(\doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}\ *koefs,\ \textcolor{keywordtype}{bool}\ typeenter);}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \textcolor{comment}{//\ решатель\ квадратного\ уравнения}}
+\DoxyCodeLine{00088\ KSolves\ solveLinear(\textcolor{keywordtype}{double}\ k,\ \textcolor{keywordtype}{double}\ b,\ \textcolor{keywordtype}{double}\ *x);}
+\DoxyCodeLine{00089\ KSolves\ solveSquare(\doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}\ koefs,\ \textcolor{keywordtype}{double}\ *x1,\ \textcolor{keywordtype}{double}\ *x2);}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \textcolor{comment}{//\ вывод\ корней}}
+\DoxyCodeLine{00092\ \textcolor{keywordtype}{void}\ printSolves(KSolves\ solution\_type,\ \textcolor{keywordtype}{double}\ x1,\ \textcolor{keywordtype}{double}\ x2);}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \textcolor{comment}{//\ расчет\ ax\string^2\ +\ bx\ +\ c}}
+\DoxyCodeLine{00095\ \textcolor{keywordtype}{double}\ countEq(\doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}\ koefs,\ \textcolor{keywordtype}{double}\ x);}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \textcolor{comment}{//\ запуск\ рандомных\ тестов}}
+\DoxyCodeLine{00098\ \textcolor{keywordtype}{bool}\ runRandomTest(\textcolor{keywordtype}{long}\ num\_tests);}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ \textcolor{comment}{//\ построение\ графика\ на\ основе\ scale}}
+\DoxyCodeLine{00101\ \textcolor{keywordtype}{void}\ drawPlot(\doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}\ koefs);}
+\DoxyCodeLine{00102\ \textcolor{comment}{//\ постороение\ графика\ на\ основе\ смещений}}
+\DoxyCodeLine{00103\ \textcolor{keywordtype}{void}\ drawPlotOffset(\doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}\ koefs);}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \textcolor{comment}{//\ получение\ правильного\ типа\ решения\ на\ основе\ вершины\ параболы}}
+\DoxyCodeLine{00106\ KSolves\ getRightSolutionType(\doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}\ koefs);}
+\DoxyCodeLine{00107\ \textcolor{comment}{//\ проверка\ правильности\ ответа\ подстановкой}}
+\DoxyCodeLine{00108\ \textcolor{keywordtype}{bool}\ checkTestAnswer(\doxymbox{\hyperlink{structSquareKoefs}{SquareKoefs}}\ koefs,\ KSolves\ solution\_type\_ans,\ \textcolor{keywordtype}{double}\ x1,\ \textcolor{keywordtype}{double}\ x2);}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \textcolor{comment}{//\ функции\ для\ флагов}}
+\DoxyCodeLine{00111\ \textcolor{keywordtype}{void}\ setSeed(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ argc,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *argv[],\ \textcolor{keywordtype}{void}\ *arg\_values);}
+\DoxyCodeLine{00112\ \textcolor{keywordtype}{void}\ setTestFilename(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ argc,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *argv[],\ \textcolor{keywordtype}{void}\ *arg\_values);}
+\DoxyCodeLine{00113\ \textcolor{keywordtype}{void}\ setNumTests(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ argc,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *argv[],\ \textcolor{keywordtype}{void}\ *arg\_values);}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \textcolor{preprocessor}{\#endif}}
 
 \end{DoxyCode}

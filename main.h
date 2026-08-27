@@ -71,11 +71,10 @@ bool runTest(SquareKoefs koefs);
 // юнит тесты из файла
 bool runUnittestsFromFile(const char *filename);
 
-/*! старое, пытался doxygen но не создает
+/** 
+ * @brief старое, пытался doxygen но не создает
  * функция для ввода 3 чисел с плавающей точкой
- * @param[in] a - старший коэффициент
- * @param[in] b - коэффициент
- * @param[in] c - свободный член
+ *
  */
 bool getKoefsABC(SquareKoefs* koefs);
 // ввод уравнения с парсером

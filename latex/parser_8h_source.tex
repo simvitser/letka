@@ -1,0 +1,24 @@
+\doxysection{parser.\+h}
+\hypertarget{parser_8h_source}{}\label{parser_8h_source}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ \_PARSER\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ \_PARSER\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#define\ MAX\_ARGS\_PER\_FLAG\ 10\ }\textcolor{comment}{//\ максимальное\ количество\ аргументов\ у\ флага\ из\ командной\ строки}}
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00009\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ name;\ }
+\DoxyCodeLine{00010\ \ \ \ \ uint64\_t\ mask;}
+\DoxyCodeLine{00011\ \ \ \ \ void\ (*function)(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ argc,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *argv[],\ \textcolor{keywordtype}{void}*\ arg\_values);}
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ usage;\ }
+\DoxyCodeLine{00013\ \}\ \doxymbox{\hyperlink{structMyFlag}{MyFlag}};}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \textcolor{comment}{//\ парсер\ аргументов\ командной\ строки}}
+\DoxyCodeLine{00016\ uint64\_t\ parseArgs(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}\ *argv[],\ \textcolor{keywordtype}{void}*\ arg\_values,\ \textcolor{keywordtype}{int}\ k\_flags,\ \textcolor{keyword}{const}\ \doxymbox{\hyperlink{structMyFlag}{MyFlag}}*\ flags\_list);}
+\DoxyCodeLine{00018\ \textcolor{keywordtype}{void}\ processFlagString(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}\ *argv[],\ \textcolor{keywordtype}{void}\ *arg\_values,\ \textcolor{keywordtype}{int}\ k\_flags,\ \textcolor{keyword}{const}\ \doxymbox{\hyperlink{structMyFlag}{MyFlag}}*\ flags\_list,\ uint64\_t\ *flags);}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

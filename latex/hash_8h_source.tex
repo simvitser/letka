@@ -9,13 +9,14 @@
 \DoxyCodeLine{00006\ \textcolor{preprocessor}{\#define\ MAX\_LEN\_LOGIN\ 20}}
 \DoxyCodeLine{00007\ \textcolor{preprocessor}{\#define\ MAX\_LEN\_PASSWORD\ 30}}
 \DoxyCodeLine{00008\ }
-\DoxyCodeLine{00009\ uint64\_t\ hash1(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ s);}
-\DoxyCodeLine{00010\ \textcolor{comment}{//\ TODO:\ Docs\ what\ algorithm}}
-\DoxyCodeLine{00011\ uint64\_t\ hash2(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ s);}
-\DoxyCodeLine{00012\ }
-\DoxyCodeLine{00013\ \textcolor{keywordtype}{void}\ signup();}
-\DoxyCodeLine{00014\ \textcolor{keywordtype}{bool}\ signin();}
-\DoxyCodeLine{00015\ }
-\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00009\ \textcolor{comment}{//\ хэш\ функция\ на\ основе\ переполнения\ uint64\_t}}
+\DoxyCodeLine{00010\ uint64\_t\ hash1(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ s);}
+\DoxyCodeLine{00011\ \textcolor{comment}{//\ хэш\ функция\ на\ основе\ остатка\ деления\ на\ 1e9\ -\/\ 3}}
+\DoxyCodeLine{00012\ uint64\_t\ hash2(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ s);}
+\DoxyCodeLine{00013\ }
+\DoxyCodeLine{00014\ \textcolor{keywordtype}{void}\ signup();}
+\DoxyCodeLine{00015\ \textcolor{keywordtype}{bool}\ signin();}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#endif}}
 
 \end{DoxyCode}

@@ -17,4 +17,7 @@ uint64_t parseArgs(int argc, char const *argv[], void* arg_values, int k_flags, 
 /// process one flag
 void processFlagString(const int argc, char const *argv[], void *arg_values, int k_flags, const MyFlag* flags_list, uint64_t *flags);
 
+// функция генерации помощи
+void printHelp(const int k_flags, const MyFlag* flags_list);
+
 #endif

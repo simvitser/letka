@@ -9,8 +9,9 @@ var NAVTREEINDEX0 =
 "index.html":[],
 "main_8h_source.html":[1,0,3],
 "pages.html":[],
+"parser_8h_source.html":[1,0,4],
 "structArgValues.html":[0,0,0],
+"structMyFlag.html":[0,0,1],
 "structSquareKoefs.html":[0,0,2],
-"structTestCase.html":[0,0,3],
-"structmyFlag.html":[0,0,1]
+"structTestCase.html":[0,0,3]
 };

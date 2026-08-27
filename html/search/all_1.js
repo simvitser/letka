@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['myflag_0',['myFlag',['../structmyFlag.html',1,'']]]
+  ['myflag_0',['MyFlag',['../structMyFlag.html',1,'']]]
 ];

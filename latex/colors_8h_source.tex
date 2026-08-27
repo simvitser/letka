@@ -5,19 +5,16 @@
 \DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ \_COLORS\_H}}
 \DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
 \DoxyCodeLine{00004\ }
-\DoxyCodeLine{00005\ \textcolor{keyword}{enum}\ COLORS\ \{}
-\DoxyCodeLine{00006\ \ \ \ \ BLACK\ =\ 30,}
-\DoxyCodeLine{00007\ \ \ \ \ RED,}
-\DoxyCodeLine{00008\ \ \ \ \ GREEN,}
-\DoxyCodeLine{00009\ \ \ \ \ YELLOW,}
-\DoxyCodeLine{00010\ \ \ \ \ BLUE,}
-\DoxyCodeLine{00011\ \ \ \ \ PURPLE,}
-\DoxyCodeLine{00012\ \ \ \ \ LIGHTBLUE,}
-\DoxyCodeLine{00013\ \ \ \ \ WHITE,}
-\DoxyCodeLine{00014\ \ \ \ \ STANDART\ =\ 39}
-\DoxyCodeLine{00015\ \};}
-\DoxyCodeLine{00016\ }
-\DoxyCodeLine{00017\ \textcolor{keywordtype}{void}\ coloredPrintf(uint8\_t\ text\_color,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *s);}
-\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#define\ BLACK\ \ \ \ \ "{}\(\backslash\)033[30m"{}}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#define\ RED\ \ \ \ \ \ \ "{}\(\backslash\)033[31m"{}}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#define\ GREEN\ \ \ \ \ "{}\(\backslash\)033[32m"{}}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#define\ YELLOW\ \ \ \ "{}\(\backslash\)033[33m"{}}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#define\ BLUE\ \ \ \ \ \ "{}\(\backslash\)033[34m"{}}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#define\ PURPLE\ \ \ \ "{}\(\backslash\)033[35m"{}}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#define\ LIGHTBLUE\ "{}\(\backslash\)033[36m"{}}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#define\ WHITE\ \ \ \ \ "{}\(\backslash\)033[37m"{}}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#define\ STANDART\ \ "{}\(\backslash\)033[0m"{}\ }}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#endif}}
 
 \end{DoxyCode}

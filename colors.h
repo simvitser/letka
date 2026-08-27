@@ -1,6 +1,5 @@
 #ifndef _COLORS_H
 #define _COLORS_H
-#include <stdint.h>
 
 #define BLACK     "\033[30m"
 #define RED       "\033[31m"

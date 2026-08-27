@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "parser.h"
 
@@ -7,8 +8,8 @@
 uint64_t parseArgs(int argc, char const *argv[], void* arg_values, int k_flags, const MyFlag* flags_list) {
     assert(argv != NULL);
     assert(flags_list != NULL);
-    uint64_t ans = 0;
 
+    uint64_t ans = 0;
     int i = 1;
     while (strncmp("--", argv[i], 2)) i++;
 
@@ -35,12 +36,20 @@ void processFlagString(const int argc, char const *argv[], void *arg_values, int
     assert(argv != NULL);
     assert(flags_list != NULL);
     assert(flags != NULL);
+
     for (int i = 0; i < k_flags; i++) {
         if (!strcmp(flags_list[i].name, argv[0])) {
             *flags |= flags_list[i].mask;
             if (flags_list[i].function) flags_list[i].function(argc, argv, arg_values);
             break;
         }
+    }
+}
+
+void printHelp(const int k_flags, const MyFlag* flags_list) {
+    printf("Usage:\n");
+    for (int i = 0; i < k_flags; i++) {
+        printf("%s: %s\n", flags_list[i].name, flags_list[i].usage);
     }
 }
 
