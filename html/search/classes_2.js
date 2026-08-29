@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['squarekoefs_0',['SquareKoefs',['../structSquareKoefs.html',1,'']]]
+  ['point_0',['Point',['../structPoint.html',1,'']]]
 ];

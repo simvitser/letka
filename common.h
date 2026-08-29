@@ -7,7 +7,7 @@
 #define STATIC_LEN(s) (int)sizeof(s) / (int)sizeof(s[0])
 
 #define STR2(x) #x
-#define STR(x) STR2(x) //TODO: спросить Деда
+#define STR(x) STR2(x)
 
 void clearInputBuffer();
 bool isZero(double n);

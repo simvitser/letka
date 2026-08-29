@@ -1,6 +1,9 @@
 #define TESTS
-#define MYDEBUGARGS if (GLOBAL_DEBUG_PARSE)
+
+#define MYDEBUGARGS  if (GLOBAL_DEBUG_PARSE)
 #define MYDEBUGPARSE if (GLOBAL_DEBUG_PARSE)
+#define MYDEBUGREQ   if (GLOBAL_DEBUG_SOLVE_REQ)
+#define QUIET        if (!GLOBAL_QUIET) 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,9 +18,10 @@
 #include "main.h"
 #include "parser.h"
 
-bool GLOBAL_QUIET = false;
-bool GLOBAL_DEBUG_ARGS = false;
-bool GLOBAL_DEBUG_PARSE = false;
+bool GLOBAL_QUIET           = false;
+bool GLOBAL_DEBUG_ARGS      = false;
+bool GLOBAL_DEBUG_PARSE     = false;
+bool GLOBAL_DEBUG_SOLVE_REQ = false;
 
 static const MyFlag FLAGS[] = {
     {"--help",           FLAG_HELP,             NULL,            "show help"},
@@ -26,6 +30,7 @@ static const MyFlag FLAGS[] = {
     {"--testin",         FLAG_RUNTEST,          setTestFilename, "parametr: [file.txt] unittests from file"},
     {"--debugargs",      FLAG_DEBUGARGS,        NULL,            "debug argparse"},
     {"--debugparse",     FLAG_DEBUGPARSE,       NULL,            "debug parsing eq"},
+    {"--debugreq",       FLAG_DEBUGREQ,         NULL,            "debug solveReq"},
     {"--drawplot",       FLAG_DRAWPLOT,         NULL,            "draw a plot"},
     {"--drawplotoffset", FLAG_DRAWPLOTOFFSET,   NULL,            "draw a plot by offsets"},
     {"--signup",         FLAG_SIGNUP,           NULL,            "register a user"},
@@ -43,9 +48,11 @@ int main(const int argc, const char *argv[]) {
         printHelp(STATIC_LEN(FLAGS), FLAGS);
     }
 
-    GLOBAL_QUIET = flags & FLAG_QUIET;
-    GLOBAL_DEBUG_ARGS = flags & FLAG_DEBUGARGS;
-    GLOBAL_DEBUG_PARSE = flags & FLAG_DEBUGPARSE; 
+    GLOBAL_QUIET           = flags & FLAG_QUIET;
+    GLOBAL_DEBUG_ARGS      = flags & FLAG_DEBUGARGS;
+    GLOBAL_DEBUG_PARSE     = flags & FLAG_DEBUGPARSE;
+    GLOBAL_DEBUG_SOLVE_REQ = flags & FLAG_DEBUGREQ;
+
     if (flags & FLAG_RUNTEST) {
         if (!runUnittestsFromFile(values.filename)) return MAINERRORS_FAILEDTESTS;
     }
@@ -60,7 +67,6 @@ int main(const int argc, const char *argv[]) {
         startGame();
     }
 
-
     QUIET {
         printf("This not AI-generated reshalka\n");
         printf(WHITE "POL" BLUE "TO" RED "RASHKA\n" STANDART);
@@ -69,16 +75,23 @@ int main(const int argc, const char *argv[]) {
     if (!signin())
         return MAINERRORS_FAILEDSIGNIN;
 
-    SquareKoefs koefs = {NAN, NAN, NAN};
-    while (!getKoefs(&koefs, flags & FLAG_TYPEENTER)) {
-        double x1 = NAN, x2 = NAN;
-        KSolves solution_type = solveSquare(koefs, &x1, &x2);
-        printSolves(solution_type, x1, x2);
+    double koefs[MAX_POWER] = {};
+    for (int i = 0; i < MAX_POWER; i++) {
+        koefs[i] = NAN;
+    }
+    
+    int max_power = 0;
+    while ((max_power = getKoefs(koefs)) != -1) {
+        double roots[MAX_POWER] = {};
+        for (int i = 0; i < MAX_POWER; i++) {
+            roots[i] = NAN;
+        }
+
+        int k_roots = solveReq(koefs, roots, max_power);
+        printSolves(k_roots, roots);
 
         if (flags & FLAG_DRAWPLOT) {
-            drawPlot(koefs);
-        } else if (flags & FLAG_DRAWPLOTOFFSET) {
-            drawPlotOffset(koefs);
+            drawPlot(koefs, max_power, k_roots, roots);
         }
     }
 
@@ -86,45 +99,19 @@ int main(const int argc, const char *argv[]) {
     return 0;
 }
 
-bool getKoefs(SquareKoefs *koefs, bool typeenter) {
-    assert(koefs != NULL);
-
-    if (typeenter) {
-        return getKoefsABC(koefs);
-    }
-
-    return getKoefsParser(koefs);
-}
-
-// [[deprecated("This is old method, use getKoefsParser")]]
-bool getKoefsABC(SquareKoefs *koefs) {
+int getKoefs(double *koefs) {
+    int max_power = 0;
     assert(koefs != NULL); 
 
-    QUIET printf("(old) enter a b c\n>>> ");
-    int ch = 0;
-    while (scanf("%lg %lg %lg", &(koefs->a), &(koefs->b), &(koefs->c)) != 3) {
-        while ((ch = getchar()) != '\n') {
-            if (ch == 'q' || ch == EOF)
-                return 1;
-        }
-        QUIET printf("NO. enter a b c\n>>> ");
-    }
-
-    clearInputBuffer();
-    return 0;
-}
-
-bool getKoefsParser(SquareKoefs *koefs) {
-    assert(koefs != NULL); 
-
-    char s_input[MAX_LEN] = {0};
-    char s_result[MAX_LEN * 2] = {0};
+    char s_input[MAX_LEN]      = {};
+    char s_result[MAX_LEN * 2] = {};
     int result_index = 1;
     do {
+        for (int i = 0; i < 2 * MAX_LEN; i++) s_result[i] = '\0';
         QUIET printf("enter a eq\n>>> ");
         fgets(s_input, MAX_LEN, stdin);
         if (strchr(s_input, 'q') != NULL)
-            return true;
+            return -1;
 
         result_index = 0;
         for (int input_index = 0; s_input[input_index] != '\0'; input_index++) {
@@ -138,27 +125,37 @@ bool getKoefsParser(SquareKoefs *koefs) {
             }
         }
         s_result[result_index] = '+';
-    } while (result_index == 0 || parseKoefs(s_result, koefs) ||
-        !(isfinite(koefs->a) && isfinite(koefs->b) && isfinite(koefs->c)));
+    } while (result_index == 0 || ((max_power = parseKoefs(s_result, koefs)) == -1) || !isfiniteKoefs(koefs, max_power));
 
     printf("START SOLVING...\n");
-    return false;
+    return max_power;
 }
 
-bool parseKoefs(char *s_input, SquareKoefs *koefs) {
+bool isfiniteKoefs(double *koefs, int max_power) {
+    for (int i = 0; i <= max_power; i++) if (!isfinite(koefs[i])) return false;
+    return true;
+}
+
+int parseKoefs(char *s_input, double *koefs) {
     assert(s_input != NULL);
     assert(koefs != NULL);
 
-    MYDEBUGPARSE printf("get: %s\n\n", s_input);
+    static double koefs_sum[MAX_POWER] = {};
+    for (int i = 0; i < MAX_POWER; i++) {
+        koefs_sum[i] = 0;
+    }
+    int max_power = 0;
 
-    double a_sum = 0, b_sum = 0, c_sum = 0;
     int8_t sign = 1;
-    static const char square_plus[] = "x^2+";
-    static const char x_plus[] = "x+";
-    static const char plus[] = "+";
+    static const char x_power[]      = "x^";
+    static const char x_plus[]       = "x+";
+    static const char plus[]         = "+";
     static const char minus_x_plus[] = "-x+";
-    static const char minus_square_plus[] = "-x^2+";
+    static const char minus_power[]  = "-x^";
+
+    if (s_input[0] == '+') s_input++;
     do {
+        MYDEBUGPARSE printf("get: %s\n\n", s_input);
         char *parse_end = NULL;
         double num_now = strtod(s_input, &parse_end);
         if (s_input == parse_end) {
@@ -166,48 +163,55 @@ bool parseKoefs(char *s_input, SquareKoefs *koefs) {
         }
         s_input = parse_end;
 
-        MYDEBUGPARSE printf("s: %s, temp: %lg, mn: %d, a b c: %lg %lg %lg\n", s_input, num_now, sign, a_sum, b_sum, c_sum);
-
-        if (!strncmp(s_input, square_plus, STATIC_STRLEN(square_plus))) {
-            a_sum += num_now * sign;
-            s_input += STATIC_STRLEN(square_plus);
+        if (!strncmp(s_input, x_power, STATIC_STRLEN(x_power))) {
+            s_input += STATIC_STRLEN(x_power);
+            int power_now = (int)strtol(s_input, &parse_end, 10);
+            if (power_now >= MAX_POWER) return -1;
+            if (power_now > max_power) max_power = (int8_t)power_now;
+            s_input = parse_end + 1; // скип +
+            koefs_sum[power_now] += num_now * sign;
         } else if (!strncmp(s_input, x_plus, STATIC_STRLEN(x_plus))) {
-            b_sum += num_now * sign;
+            if (max_power == 0) max_power = 1;
+            koefs_sum[1] += num_now * sign;
             s_input += STATIC_STRLEN(x_plus);
         } else if (!strncmp(s_input, plus, STATIC_STRLEN(plus))) {
-            c_sum += num_now * sign;
+            koefs_sum[0] += num_now * sign;
             s_input += STATIC_STRLEN(plus);
         } else if (!strncmp(s_input, minus_x_plus, STATIC_STRLEN(minus_x_plus))) {
-            b_sum -= num_now * sign;
+            if (max_power == 0) max_power = 1;
+            koefs_sum[1] -= num_now * sign;
             s_input += STATIC_STRLEN(minus_x_plus);
-        } else if (!strncmp(s_input, minus_square_plus, STATIC_STRLEN(minus_square_plus))) {
-            a_sum -= num_now * sign;
-            s_input += STATIC_STRLEN(minus_square_plus);
+        } else if (!strncmp(s_input, minus_power, STATIC_STRLEN(minus_power))) {
+            s_input += STATIC_STRLEN(minus_power);
+            int power_now = (int)strtol(s_input, &parse_end, 10);
+            if (power_now >= MAX_POWER) return -1;
+            if (power_now > max_power) max_power = power_now;
+            s_input = parse_end + 1; // скип +
+            koefs_sum[power_now] -= num_now * sign;
         } else if (s_input[0] != '\0') {
-            MYDEBUGPARSE printf("s: %s, a b c: %lg %lg %lg\n", s_input, koefs->a, koefs->b, koefs->c);
-            return 1;
+            return -1;
         }
 
         if (*s_input == '=') {
             if (sign < 0)
-                return 1;
+                return -1;
             s_input++;
             sign *= -1;
             if (*s_input == '+')
                 s_input++;
         }
     } while (*s_input != '\0');
-
-    koefs->a = a_sum;
-    koefs->b = b_sum;
-    koefs->c = c_sum;
-
-    MYDEBUGPARSE printf("a b c: %lg %lg %lg\n", koefs->a, koefs->b, koefs->c);
-
-    return 0;
+    
+    for (int i = 0; i <= max_power; i++) {
+        MYDEBUGPARSE printf("%lg ", koefs_sum[i]);
+        koefs[i] = koefs_sum[i];
+    }
+    MYDEBUGPARSE putchar('\n');
+    MYDEBUGPARSE printf("max_power: %d\n", max_power);
+    return max_power;
 }
 
-KSolves solveLinear(double k, double b, double *x) {
+int solveLinear(double k, double b, double *x) {
     assert(isfinite(k));
     assert(isfinite(b));
     assert(x != NULL);
@@ -215,112 +219,144 @@ KSolves solveLinear(double k, double b, double *x) {
     if (isZero(k)) {
         if (isZero(b))
             return INF_SOLVES;
-        return ZERO_SOLVES;
+        return 0;
     }
 
     *x = -b / k;
-    return ONE_SOLVE;
+    return 1;
 }
 
-KSolves solveSquare(SquareKoefs koefs, double *x1, double *x2) {
-    assert(isfinite(koefs.a));
-    assert(isfinite(koefs.b));
-    assert(isfinite(koefs.c));
-    assert(x1 != NULL);
-    assert(x2 != NULL);
-    assert(x1 != x2);
-
-    if (isZero(koefs.a)) {
-        return solveLinear(koefs.b, koefs.c, x1);
+int solveReq(double *koefs, double *roots, int max_power) {
+    assert(koefs != NULL);
+    assert(roots != NULL);
+    
+    MYDEBUGREQ {
+        printf("start req: %d     ", max_power);
+        for (int i = 0; i <= max_power; i++) printf("%lg ", koefs[i]);
+        putchar('\n');
     }
 
-    double D = koefs.b * koefs.b - 4 * koefs.a * koefs.c;
-    if (D < -EPS) {
-        return ZERO_SOLVES;
-    } else if (D < EPS) {
-        *x1 = -koefs.b / (2 * koefs.a);
-        *x2 = *x1;
-        return ONE_SOLVE;
-    } else {
-        double sqrtD = sqrt(D);
-        *x1 = (-koefs.b - sqrtD) / (2 * koefs.a);
-        *x2 = (-koefs.b + sqrtD) / (2 * koefs.a);
-        return TWO_SOLVES;
+    if (max_power == 0) {
+        if (isZero(koefs[0])) return INF_SOLVES;
+        return 0;
     }
+
+    if (max_power == 1) {
+        return solveLinear(koefs[1], koefs[0], roots);
+    }
+
+    double koefs_dx[MAX_POWER] = {};
+    for (int i = 1; i <= max_power; i++) {
+        koefs_dx[i - 1] = koefs[i] * i;
+    }
+
+    double roots_dx[MAX_POWER] = {};
+
+    int k_roots_dx = solveReq(koefs_dx, roots_dx + 1, max_power - 1);
+    roots_dx[k_roots_dx + 1] = 1e9;
+    roots_dx[0] = -1e9;
+    k_roots_dx++;
+
+    MYDEBUGREQ for (int i = 0; i <= k_roots_dx; i++) printf("%lg ", roots_dx[i]);
+    MYDEBUGREQ putchar('\n');
+
+    int k_roots = 0;
+
+    for (int i = 0; i < k_roots_dx; i++) {
+        double root = findRoot(roots_dx[i], roots_dx[i + 1], koefs, max_power);
+        MYDEBUGREQ printf("find root: %lg,    max_power: %d,    already k_roots: %d\n", root, max_power, k_roots);
+
+        if (isfinite(root)) {
+            bool matched = false;
+            for (int j = 0; j < k_roots; j++) {
+                MYDEBUGREQ printf("<><><   %lg    %lg    %d\n", root, roots[j], isEqual(root, roots[j]));
+                if (isEqualRoots(root, roots[j])) {
+                    matched = true;
+                    break;
+                }
+            }
+            if (!matched) {
+                roots[k_roots] = root;
+                k_roots++;
+            }
+        }
+    } 
+
+    return k_roots;
 }
 
-void printSolves(KSolves solution_type, double x1, double x2) {
-    switch (solution_type) {
-    case ZERO_SOLVES:
-        puts("NO solutions");
-        break;
-    case ONE_SOLVE:
-        printf("one solution: %lg -\n", x1);
-        break;
-    case TWO_SOLVES:
-        printf("two solutions: %lg %lg\n", x1, x2);
-        break;
-    case INF_SOLVES:
-        puts("ALL IN");
-        break;
-    default:
-        assert(false);
+double findRoot(double l, double r, double *koefs, int max_power) {
+    assert(koefs != NULL);
+
+    MYDEBUGREQ printf("want find roots, l: %lg, r: %lg, max_power: %d\n", l, r, max_power);
+
+    if ((countEq(koefs, max_power, l) > EPS)  && (countEq(koefs, max_power, r) > EPS))  return NAN;
+    if ((countEq(koefs, max_power, l) < -EPS) && (countEq(koefs, max_power, r) < -EPS)) return NAN;
+
+    int8_t sign = countEq(koefs, max_power, l) > countEq(koefs, max_power, r) ? -1 : 1;
+    while (r - l >= EPS) {
+        double m = (l + r) / 2;
+        if (countEq(koefs, max_power, m) * sign > 0) {
+            r = m;
+        } else {
+            l = m;
+        }
     }
+    MYDEBUGREQ printf("%lg   %lg    bin\n", l, r);
+    if (fabs(countEq(koefs, max_power, l)) <= EPS_ROOT) return l;
+    return NAN;
 }
 
-bool runTest(SquareKoefs koefs) {
-    double x1 = NAN, x2 = NAN;
-    KSolves solution_type = solveSquare(koefs, &x1, &x2);
-
-    if (!checkTestAnswer(koefs, solution_type, x1, x2)) {
-        QUIET printf("FAILED solve: a: %lg b: %lg c: %lg, x1: %lg x2: %lg\n",
-                         koefs.a, koefs.b, koefs.c, x1, x2);
-        return false;
+void printSolves(int k_roots, double* roots) {
+    QUIET printf("get k_roots: %d\n", k_roots);
+    if (k_roots == INF_SOLVES) {
+        printf("inf solves\n");
+        return;
     }
-    return true;
+    for (int i = 0; i < k_roots; i++) {
+        printf("%.4lf ", roots[i]);
+    }
+    putchar('\n');
 }
 
 bool runUnittest(TestCase test) {
-    double x1 = NAN, x2 = NAN;
+    double roots[MAX_POWER] = {};
     bool passed = true;
-    KSolves solution_type = solveSquare(test.koefs, &x1, &x2);
-    if (solution_type != test.solution_type) {
-        passed = false;
-    } else {
-        switch (solution_type) {
-        case ZERO_SOLVES:
-            passed = true;
-            break;
-        case ONE_SOLVE:
-            passed = isEqual(test.x1, x1);
-            break;
-        case TWO_SOLVES:
-            passed = (isEqual(test.x1, x1) && isEqual(test.x2, x2)) || (isEqual(test.x2, x1) && isEqual(test.x1, x2));\
-            break;
-        case INF_SOLVES:
-            passed = true;
-            break;
-        default:
-            assert(false);
+    int k_roots = solveReq(test.koefs, roots, test.max_power);
+    if (k_roots == test.k_roots) {
+        for (int i = 0; i < k_roots; i++) {
+            if (!isEqualRoots(roots[i], test.roots[i])) {
+                passed = false;
+                break;
+            }
         }
-    }
+    } else passed = false;
 
     if (!passed) {
-        QUIET printf(RED "FAILED" STANDART " solve: a: %lg b: %lg c: %lg, x1: %lg x2: %lg, x1_ref: %lg, x2_ref: %lg, solution_type: %d, solution_type_ref: %d\n",
-                         test.koefs.a, test.koefs.b, test.koefs.c, 
-                         x1, x2, test.x1, test.x2, 
-                         solution_type, test.solution_type);
+        QUIET printf(RED "FAILED" STANDART);
+        for (int i = 0; i < test.max_power; i++) {
+            QUIET printf("%lg ", test.koefs[i]);
+        }
+        QUIET putchar('\n');
     }
     return passed;
-
 }
 
 void runUnittests() {
 #ifdef TESTS
-    assert(runUnittest((TestCase){ {0,   0,   0},   INF_SOLVES        }));
-    assert(runUnittest((TestCase){ {4,   5,   6},  ZERO_SOLVES        }));
-    assert(runUnittest((TestCase){ {1,   2,   1},    ONE_SOLVE, -1    }));
-    assert(runUnittest((TestCase){ {2, -24,  64},   TWO_SOLVES,  4, 8 }));
+    double koefs[] = {-20.0, 0.0, 0.0, 1.0, 1.0};
+    double roots[] = {-2.4168, 1.9028};
+    assert(runUnittest((TestCase){
+        koefs,
+        .max_power = 4,  .k_roots = 2,
+        roots
+    }));
+    double koefs2[] = {-20.0, 0.0, 0.0, 1.0, -1.0};
+    assert(runUnittest((TestCase){
+        koefs2,
+        .max_power = 4,  .k_roots = 0,
+        NULL
+    }));
 #endif
 }
 
@@ -361,30 +397,24 @@ bool runUnittestsFromFile(const char *filename) {
         return false;
     }
 
-    SquareKoefs koefs = {};
-    char solution_type_char = 0;
+    double koefs[MAX_POWER] = {}, roots[MAX_POWER] = {};
+    int k_roots = 0, max_power = 0;
     bool passed = true;
     printf("starting tests...\n");
-    while (fscanf(file, "%lg %lg %lg %c", &koefs.a, &koefs.b, &koefs.c, &solution_type_char) == 4) {
-        KSolves solution_type_ref = ZERO_SOLVES;
-        double x1 = NAN, x2 = NAN;
-        switch (solution_type_char) {
-        case '0':
-            solution_type_ref = ZERO_SOLVES;
-            break;
-        case '1':
-            fscanf(file, "%lg", &x1);
-            solution_type_ref = ONE_SOLVE;
-            break;
-        case '2':
-            fscanf(file, "%lg %lg", &x1, &x2);
-            solution_type_ref = TWO_SOLVES;
-            break;
-        default:
-            solution_type_ref = INF_SOLVES;
-            break;
+    while (fscanf(file, "%d", &max_power) == 1) {
+        for (int i = 0; i <= max_power; i++) {
+            fscanf(file, "%lg", koefs + i);
         }
-        bool ans = runUnittest((TestCase) {(SquareKoefs) koefs, solution_type_ref, x1, x2});
+        
+        fscanf(file, "%d", &k_roots);
+        for (int i = 0; i < k_roots; i++) {
+            fscanf(file, "%lg", roots + i);
+        }
+
+        bool ans = runUnittest((TestCase){
+            koefs, max_power, k_roots, roots
+        }); 
+
         passed = passed && ans;
     }
 
@@ -395,45 +425,31 @@ bool runUnittestsFromFile(const char *filename) {
     return passed;
 }
 
+bool runTest(double *koefs, int max_power) {
+    double roots[MAX_POWER] = {};
+    int k_roots = solveReq(koefs, roots, max_power);
+    if (!checkTestAnswer(koefs, max_power, k_roots, roots)) {
+        QUIET printf(RED "FAILED " STANDART "solve: ");
+        for (int i = 0; i <= max_power; i++) {
+            QUIET printf("%lg ", koefs[i]);
+        }
+        QUIET putchar('\n');
+        return false;
+    }
+    return true;
+}
+
 bool runRandomTest(long num_tests) {
-    QUIET printf("starting tests from file...\n");
-    double x1 = NAN, x2 = NAN, x1_ref = NAN, x2_ref = NAN;
-    SquareKoefs koefs = {NAN, NAN, NAN};
-    for (int i = 0; i < num_tests; i++) {
-        koefs.a = randDouble();
-        koefs.b = randDouble();
-        koefs.c = randDouble();
-        if (!runTest(koefs)) {
-            return false;
-        }
-    }
+    QUIET printf("starting random tests...\n");
+    double koefs[MAX_POWER] = {};
 
-
-    koefs.a = 0;
-    for (int i = 0; i < num_tests; i++) {
-        koefs.b = randDouble();
-        koefs.c = randDouble();
-        if (!runTest(koefs)) {
-            return false;
-        }
-    }
-
-
-    for (int i = 0; i < num_tests; i++) {
-        x1_ref = randDouble();
-        x2_ref = randDouble();
-        if (x1_ref > x2_ref) {
-            double temp = x1_ref;
-            x1_ref = x2_ref;
-            x2_ref = temp;
-        }
-
-        koefs.a = randDouble();
-        koefs.b = -koefs.a * (x1_ref + x2_ref);
-        koefs.c = x1_ref * x2_ref * koefs.a;
-        KSolves solution_type = solveSquare(koefs, &x1, &x2);
-        if (!checkTestAnswer(koefs, solution_type, x1, x2)) {
-            return false;
+    for (int max_power = 1; max_power < MAX_POWER; max_power++) {
+        QUIET printf("Started rnd max_power: %d\n", max_power);
+        for (int index_test = 0; index_test < num_tests; index_test++) {
+            for (int i = 0; i <= max_power; i++) {
+                koefs[i] = randDouble();
+            }
+            if (!runTest(koefs, max_power)) return false;
         }
     }
 
@@ -441,50 +457,31 @@ bool runRandomTest(long num_tests) {
     return true;
 }
 
-double countEq(SquareKoefs koefs, double x) {
-    return koefs.a * x * x + koefs.b * x + koefs.c;
-}
-
-bool checkTestAnswer(SquareKoefs koefs, KSolves solution_type_ans, double x1, double x2) {
-    KSolves solution_type_ref = getRightSolutionType(koefs);
-    if (solution_type_ans != solution_type_ref) return false;
-    switch (solution_type_ans) {
-        case ZERO_SOLVES:
-        case INF_SOLVES:
-            return true;
-        case ONE_SOLVE:
-            return isZero(countEq(koefs, x1));
-        case TWO_SOLVES:
-            return isZero(countEq(koefs, x1)) && isZero(countEq(koefs, x2));
-        default:
-            assert(false);
+double countEq(double *koefs, int max_power, double x) {
+    double ans = 0;
+    double x_ = 1;
+    for (int i = 0; i <= max_power; i++) {
+        ans += koefs[i] * x_;
+        x_ *= x;
     }
+    return ans;
 }
 
-KSolves getRightSolutionType(SquareKoefs koefs) {
-    if (!isZero(koefs.a)) {
-        double x0 = -koefs.b / (2 * koefs.a);
-        double y0 = countEq(koefs, x0);
-        if (y0 < -EPS) {
-            return TWO_SOLVES;
-        } else if (y0 < EPS) {
-            return ONE_SOLVE;
-        } else {
-            return ZERO_SOLVES;
+bool checkTestAnswer(double *koefs, int max_power, int k_roots, double* roots) {
+    for (int i = 0; i < k_roots; i++) {
+        double ans = countEq(koefs, max_power, roots[i]);
+        if (!isZeroAns(ans)) {
+            return false;
         }
-    } else if (!isZero(koefs.b)) {
-        return ONE_SOLVE;
-    } else if (!isZero(koefs.c)) {
-        return ZERO_SOLVES;
-    } else {
-        return INF_SOLVES;
     }
+    return true;
 }
 
-void drawPlotOffset(SquareKoefs koefs) {
-    assert(isfinite(koefs.a));
-    assert(isfinite(koefs.b));
-    assert(isfinite(koefs.c));
+void drawPlot(double *koefs, int max_power, int k_roots, double *roots) {
+    assert(koefs != NULL);
+    assert(isfiniteKoefs(koefs, max_power));
+    assert(roots != NULL);
+    assert(isfiniteKoefs(roots, k_roots - 1));
 
     char plot[SIZE_PLOT_Y][SIZE_PLOT_X] = {}; 
     memset(plot, ' ', sizeof plot);
@@ -500,71 +497,16 @@ void drawPlotOffset(SquareKoefs koefs) {
     plot[0][SIZE_PLOT_X / 2] = 'y';
     plot[SIZE_PLOT_Y / 2][SIZE_PLOT_X - 1] = 'x';
 
-    double stepx = 5, stepy = 0.4, offsetx = 0, offsety = 0;
-    if (isZero(koefs.a)) {
-        offsety = -koefs.c;
-    } else {
-        offsetx = koefs.b / (2 * koefs.a);
-        offsety = -countEq(koefs, -offsetx);
-    }
-
+    double stepx = 20, stepy = 1.6;
+    
     double y = NAN;
     for (int i = -SIZE_PLOT_X / 2; i < SIZE_PLOT_X / 2; i++) {
-        /* i - координата в точках
-        * поделив на stepx, получаем обычные координаты
-        * двигаем х, получаем ответ от функции, двигаем и переводим в точки
-        */
-        y = (countEq(koefs, i / stepx - offsetx) + offsety) * stepy;
+        y = countEq(koefs, max_power, i / stepx) * stepy;
         if (y < SIZE_PLOT_Y / 2 && y > -SIZE_PLOT_Y / 2)
             plot[(int)(SIZE_PLOT_Y / 2 - y)][i + SIZE_PLOT_X / 2] = '*';
     }
-    for (int i = 0; i < SIZE_PLOT_Y; i++) {
-        printf("%.*s\n", SIZE_PLOT_X, plot[i]);
-    }
-}
 
-void drawPlot(SquareKoefs koefs) {
-    assert(isfinite(koefs.a));
-    assert(isfinite(koefs.b));
-    assert(isfinite(koefs.c));
-
-    char plot[SIZE_PLOT_Y][SIZE_PLOT_X] = {}; 
-    memset(plot, ' ', sizeof plot);
-
-    for (int i = 0; i < SIZE_PLOT_X; i++) {
-        plot[SIZE_PLOT_Y / 2][i] = '-';
-    }
-    for (int i = 0; i < SIZE_PLOT_Y; i++) {
-        plot[i][SIZE_PLOT_X / 2] = '|';
-    }
-
-    plot[SIZE_PLOT_Y / 2][SIZE_PLOT_X / 2] = '+';
-    plot[0][SIZE_PLOT_X / 2] = 'y';
-    plot[SIZE_PLOT_Y / 2][SIZE_PLOT_X - 1] = 'x';
-
-    double stepx = 5, stepy = 0.4;
-    if (isZero(koefs.a)) {
-        if (fabs(koefs.c) * stepy > SIZE_PLOT_Y / 4 * 3) {
-            double scale = SIZE_PLOT_Y / 4 * 3 / koefs.c;
-            stepx *= scale;
-            stepy *= scale;
-        }
-    } else {
-        double x0 = -koefs.b / (2 * koefs.a);
-        double y0 = countEq(koefs, x0);
-        while (fabs(x0) * stepx > SIZE_PLOT_X / 4 ||
-               fabs(y0) * stepy > SIZE_PLOT_Y / 4) {
-            stepx /= 2;
-            stepy /= 2;
-        }
-    }
-
-    double y = NAN;
-    for (int i = -SIZE_PLOT_X / 2; i < SIZE_PLOT_X / 2; i++) {
-        y = countEq(koefs, i / stepx) * stepy;
-        if (y < SIZE_PLOT_Y / 2 && y > -SIZE_PLOT_Y / 2)
-            plot[(int)(SIZE_PLOT_Y / 2 - y)][i + SIZE_PLOT_X / 2] = '*';
-    }
+    for (int i = 0; i < k_roots; i++) plot[SIZE_PLOT_Y / 2][(int)(roots[i] * stepx) + SIZE_PLOT_X / 2] = '0';
 
     for (int i = 0; i < SIZE_PLOT_Y; i++) {
         printf("%.*s\n", SIZE_PLOT_X, plot[i]);
@@ -572,19 +514,21 @@ void drawPlot(SquareKoefs koefs) {
 }
 
 void printFeel(char feel[SIZE_GAME][SIZE_GAME]) {
-    if (SIZE_GAME <= 10) {
+    assert(feel != NULL);
+
+    if (SIZE_GAME <= 10) { // не больше 10 чисел - пишем верхнюю строку
         printf("    ");
         for (int i = 0; i < SIZE_GAME; i++) printf("%d", i);
         printf("\n");
     }
+
     for (int i = 0; i < SIZE_GAME; i++) {
         printf("%3d %.*s\n", i, SIZE_GAME, feel[i]);
     }
 }
 
-// в планах может быть внести это в маин через iterGame(x1, x2)
 void startGame() {
-    printf("Let`s play: enter a square eq, and abs(roots) will be coords to attack\n");
+    printf("Let`s play: enter a eq with 2 solutions, and abs(roots) will be coords to attack\n");
 
     char feel[SIZE_GAME][SIZE_GAME] = {}; 
     memset(feel, '.', sizeof feel);
@@ -598,18 +542,18 @@ void startGame() {
     printFeel(feel);
  
     int k_targets_left = K_TARGETS_GAME;
-    SquareKoefs koefs = {NAN, NAN, NAN};
-    while (k_targets_left && !getKoefsABC(&koefs)) {
-        double x1_double = NAN, x2_double = NAN;
-        KSolves solution_type = solveSquare(koefs, &x1_double, &x2_double);
-        if (solution_type != TWO_SOLVES) {
+    double koefs[MAX_POWER] = {};
+    double roots[MAX_POWER] = {};
+    int max_power = 0;
+    while (k_targets_left && (max_power = getKoefs(koefs)) != -1) { 
+        int k_roots = solveReq(koefs, roots, max_power);
+        if (k_roots != 2) {
             printf("you should enter a eq with 2 solutions\n");
             continue;
         }
         
-        int x1 = (int)fabs(x1_double), x2 = (int)fabs(x2_double);
-
-        printSolves(solution_type, x1, x2);
+        printSolves(k_roots, roots);
+        int x1 = (int)fabs(roots[0]), x2 = (int)fabs(roots[1]);
 
         if (x1 >= SIZE_GAME || x2 >= SIZE_GAME) continue;
 
@@ -618,14 +562,21 @@ void startGame() {
 
         for (int i = 0; i < K_TARGETS_GAME; i++) {
             if (x1 == targets[i].x && x2 == targets[i].y) {
+                targets[i] = (Point){SIZE_GAME, SIZE_GAME};
                 printf("Striked! Targets_left: %d\n", --k_targets_left);
             }
             if (x1 == targets[i].y && x2 == targets[i].x) {
+                targets[i] = (Point){SIZE_GAME, SIZE_GAME};
                 printf("Striked! Targets_left: %d\n", --k_targets_left);
             }
         }
 
         printFeel(feel);
     }
+    if (k_targets_left == 0) {
+        printf(GREEN "YOU WIN\n" STANDART);
+    }
 }
 
+bool isEqualRoots(double a, double b) {return isZeroAns(a - b);}
+bool isZeroAns(double a) {return fabs(a) <= EPS_ROOT;}

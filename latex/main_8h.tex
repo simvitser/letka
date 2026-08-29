@@ -1,0 +1,335 @@
+\doxysection{main.\+h File Reference}
+\hypertarget{main_8h}{}\label{main_8h}\index{main.h@{main.h}}
+
+
+основная программа  
+
+
+{\ttfamily \+\#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \+\#include $<$stdint.\+h$>$}\newline
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \doxymbox{\hyperlink{structTestCase}{Test\+Case}}
+\begin{DoxyCompactList}\small\item\em структура для тестов \end{DoxyCompactList}\item 
+struct \doxymbox{\hyperlink{structArgValues}{Arg\+Values}}
+\begin{DoxyCompactList}\small\item\em структура для возвращаемых значений \end{DoxyCompactList}\item 
+struct \doxymbox{\hyperlink{structPoint}{Point}}
+\begin{DoxyCompactList}\small\item\em структура точки для игры \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\+\#define \doxymbox{\hyperlink{main_8h_ab9feff2e87d4ceca669d767e13b36739}{myassert}}(esp)
+\item 
+\Hypertarget{main_8h_aabf4f709c8199e41cf279c77112345fe}\label{main_8h_aabf4f709c8199e41cf279c77112345fe} 
+\+\#define {\bfseries MAX\+\_\+\+LEN}~100
+\item 
+\Hypertarget{main_8h_a6e5f254e637637d3a3256dfd7a1399c7}\label{main_8h_a6e5f254e637637d3a3256dfd7a1399c7} 
+\+\#define {\bfseries MAX\+\_\+\+POWER}~20
+\item 
+\Hypertarget{main_8h_a78c017c727d9dd8bdfe7d922ba9d0be5}\label{main_8h_a78c017c727d9dd8bdfe7d922ba9d0be5} 
+\+\#define {\bfseries SIZE\+\_\+\+PLOT\+\_\+Y}~41
+\item 
+\Hypertarget{main_8h_a76192557da0e2689da8eefa8b09b545f}\label{main_8h_a76192557da0e2689da8eefa8b09b545f} 
+\+\#define {\bfseries SIZE\+\_\+\+PLOT\+\_\+X}~121
+\item 
+\Hypertarget{main_8h_a6bb68c553f99cd9346c40d77d79a1137}\label{main_8h_a6bb68c553f99cd9346c40d77d79a1137} 
+\+\#define {\bfseries SIZE\+\_\+\+GAME}~6
+\item 
+\Hypertarget{main_8h_a2c3eeb0ed2d35f671a34eb86ce62ad97}\label{main_8h_a2c3eeb0ed2d35f671a34eb86ce62ad97} 
+\+\#define {\bfseries K\+\_\+\+TARGETS\+\_\+\+GAME}~3
+\item 
+\Hypertarget{main_8h_ad2f507efd1896f55e75f81e0a15c8db5}\label{main_8h_ad2f507efd1896f55e75f81e0a15c8db5} 
+\+\#define {\bfseries INF\+\_\+\+SOLVES}~-\/1
+\item 
+\Hypertarget{main_8h_ac959ccba3bde82919f6013e5e0e42206}\label{main_8h_ac959ccba3bde82919f6013e5e0e42206} 
+\+\#define {\bfseries EPS\+\_\+\+ROOT}~1e-\/4
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{main_8h_ad82157a01d2d4e1639cc151c9e5459d0}\label{main_8h_ad82157a01d2d4e1639cc151c9e5459d0} 
+enum \doxymbox{\hyperlink{main_8h_ad82157a01d2d4e1639cc151c9e5459d0}{FLAG\+\_\+\+BYTES}} \{ \newline
+{\bfseries FLAG\+\_\+\+QUIET} = (1U \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 0)
+, {\bfseries FLAG\+\_\+\+TYPEENTER} = (1U \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 1)
+, {\bfseries FLAG\+\_\+\+RUNTEST} = (1U \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 2)
+, {\bfseries FLAG\+\_\+\+DEBUGARGS} = (1U \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 3)
+, \newline
+{\bfseries FLAG\+\_\+\+DEBUGPARSE} = (1U \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 4)
+, {\bfseries FLAG\+\_\+\+SIGNUP} = (1U \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 5)
+, {\bfseries FLAG\+\_\+\+RUNRANDOMTEST} = (1U \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 6)
+, {\bfseries FLAG\+\_\+\+DRAWPLOT} = (1U \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 7)
+, \newline
+{\bfseries FLAG\+\_\+\+DRAWPLOTOFFSET} = (1U \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 8)
+, {\bfseries FLAG\+\_\+\+SETSEED} = (1U \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 9)
+, {\bfseries FLAG\+\_\+\+HELP} = (1U \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 10)
+, {\bfseries FLAG\+\_\+\+GAME} = (1U \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 11)
+, \newline
+{\bfseries FLAG\+\_\+\+DEBUGREQ} = (1U \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 12)
+ \}
+\begin{DoxyCompactList}\small\item\em битовые маски флагов парсера аргументов \end{DoxyCompactList}\item 
+\Hypertarget{main_8h_a92f3116e4febbf8a8f2afa0344f4e379}\label{main_8h_a92f3116e4febbf8a8f2afa0344f4e379} 
+enum \doxymbox{\hyperlink{main_8h_a92f3116e4febbf8a8f2afa0344f4e379}{MAINERRORS}} \{ {\bfseries MAINERRORS\+\_\+\+FAILEDTESTS} = 67
+, {\bfseries MAINERRORS\+\_\+\+FAILEDRANDOMTEST}
+, {\bfseries MAINERRORS\+\_\+\+FAILEDSIGNIN}
+ \}
+\begin{DoxyCompactList}\small\item\em ошибки фунции main \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \doxymbox{\hyperlink{main_8h_a714f3b66f7a2c32ae390d535bccedd01}{is\+Equal\+Roots}} (double a, double b)
+\begin{DoxyCompactList}\small\item\em функция сравнения корней \end{DoxyCompactList}\item 
+bool \doxymbox{\hyperlink{main_8h_acffc16b4c90fec86ef50ec4b777f0999}{run\+Unittest}} (\doxymbox{\hyperlink{structTestCase}{Test\+Case}} test)
+\begin{DoxyCompactList}\small\item\em запуск одного юнит теста \end{DoxyCompactList}\item 
+int \doxymbox{\hyperlink{main_8h_a02fc36ec31114fb6ced067af6642d8ae}{get\+Koefs}} (double koefs\+[$\,$]\+)
+\begin{DoxyCompactList}\small\item\em ввод уравнения с парсером \end{DoxyCompactList}\item 
+int \doxymbox{\hyperlink{main_8h_a51a4635a709cda1a7b03db3b8d4028ca}{parse\+Koefs}} (char \texorpdfstring{$\ast$}{*}s, double koefs\+[$\,$]\+)
+\begin{DoxyCompactList}\small\item\em парсер коэффициентов из преобразованной строки \end{DoxyCompactList}\item 
+bool \doxymbox{\hyperlink{main_8h_a1d48a5c56ee7867f80f357c512bf674d}{isfinite\+Koefs}} (double \texorpdfstring{$\ast$}{*}koefs, int max\+\_\+power)
+\begin{DoxyCompactList}\small\item\em проверка всех коэффициентов на isfinite \end{DoxyCompactList}\item 
+int \doxymbox{\hyperlink{main_8h_a74b056662a101f15aea39bc05b2b6a2a}{solve\+Linear}} (double k, double b, double \texorpdfstring{$\ast$}{*}x)
+\begin{DoxyCompactList}\small\item\em решатель линейных уравнений \end{DoxyCompactList}\item 
+int \doxymbox{\hyperlink{main_8h_a98b778eefd5d84b5c6b0a60a5f910f5f}{solve\+Req}} (double \texorpdfstring{$\ast$}{*}koefs, double \texorpdfstring{$\ast$}{*}roots, int max\+\_\+power)
+\begin{DoxyCompactList}\small\item\em решатель квадратного уравнения \end{DoxyCompactList}\item 
+double \doxymbox{\hyperlink{main_8h_af1400ecc3800729ebaa40dc414c23aae}{find\+Root}} (double l, double r, double \texorpdfstring{$\ast$}{*}koefs, int max\+\_\+power)
+\begin{DoxyCompactList}\small\item\em бинарный поиск корня \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{main_8h_a6182486b29a05265e2fb9f0ca1d41076}{print\+Solves}} (int k\+\_\+roots, double \texorpdfstring{$\ast$}{*}roots)
+\begin{DoxyCompactList}\small\item\em вывод корней \end{DoxyCompactList}\item 
+double \doxymbox{\hyperlink{main_8h_a66758a375c33a0e02e26c42e31637b35}{count\+Eq}} (double \texorpdfstring{$\ast$}{*}koefs, int max\+\_\+power, double x)
+\begin{DoxyCompactList}\small\item\em расчет многочлена y = ... + ax\texorpdfstring{$^\wedge$}{\string^}2 + bx + x \end{DoxyCompactList}\item 
+\Hypertarget{main_8h_a3664ca41ab0ba719779d891e0d79ab74}\label{main_8h_a3664ca41ab0ba719779d891e0d79ab74} 
+void {\bfseries set\+Seed} (const int argc, const char \texorpdfstring{$\ast$}{*}argv\+[$\,$]\+, void \texorpdfstring{$\ast$}{*}arg\+\_\+values)
+\item 
+\Hypertarget{main_8h_a4ce3309feed57b9064d5201644c5cfcc}\label{main_8h_a4ce3309feed57b9064d5201644c5cfcc} 
+void {\bfseries set\+Test\+Filename} (const int argc, const char \texorpdfstring{$\ast$}{*}argv\+[$\,$]\+, void \texorpdfstring{$\ast$}{*}arg\+\_\+values)
+\item 
+\Hypertarget{main_8h_a2c67e97560cdb95007080fcf396bcad7}\label{main_8h_a2c67e97560cdb95007080fcf396bcad7} 
+void {\bfseries set\+Num\+Tests} (const int argc, const char \texorpdfstring{$\ast$}{*}argv\+[$\,$]\+, void \texorpdfstring{$\ast$}{*}arg\+\_\+values)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+основная программа 
+
+~\newline
+  
+
+\label{main_8h_doc-define-members}
+\Hypertarget{main_8h_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{main_8h_ab9feff2e87d4ceca669d767e13b36739}\index{main.h@{main.h}!myassert@{myassert}}
+\index{myassert@{myassert}!main.h@{main.h}}
+\doxysubsubsection{\texorpdfstring{myassert}{myassert}}
+{\footnotesize\ttfamily \label{main_8h_ab9feff2e87d4ceca669d767e13b36739} 
+\+\#define myassert(\begin{DoxyParamCaption}\item[{}]{esp}{}\end{DoxyParamCaption})}
+
+{\bfseries Value:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (!(esp))\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}ASSSSSERT:\ \%s!\ line:\ \%d,\ file:\ \%s,\ func:\ \%s\(\backslash\)n"{}},\ \#esp,\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \_\_LINE\_\_,\ \_\_FILE\_\_,\ \_\_func\_\_);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ abort();\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+\label{main_8h_doc-func-members}
+\Hypertarget{main_8h_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{main_8h_a66758a375c33a0e02e26c42e31637b35}\index{main.h@{main.h}!countEq@{countEq}}
+\index{countEq@{countEq}!main.h@{main.h}}
+\doxysubsubsection{\texorpdfstring{countEq()}{countEq()}}
+{\footnotesize\ttfamily \label{main_8h_a66758a375c33a0e02e26c42e31637b35} 
+double count\+Eq (\begin{DoxyParamCaption}\item[{double \texorpdfstring{$\ast$}{*}}]{koefs}{, }\item[{int}]{max\+\_\+power}{, }\item[{double}]{x}{}\end{DoxyParamCaption})}
+
+
+
+расчет многочлена y = ... + ax\texorpdfstring{$^\wedge$}{\string^}2 + bx + x 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\doxymbox{\texttt{in}}  & {\em koefs} & коэффициенты уравнения \\
+\hline
+\doxymbox{\texttt{in}}  & {\em max\+\_\+power} & степень уравнения \\
+\hline
+\doxymbox{\texttt{in}}  & {\em x} & x \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+y(x) 
+\end{DoxyReturn}
+\Hypertarget{main_8h_af1400ecc3800729ebaa40dc414c23aae}\index{main.h@{main.h}!findRoot@{findRoot}}
+\index{findRoot@{findRoot}!main.h@{main.h}}
+\doxysubsubsection{\texorpdfstring{findRoot()}{findRoot()}}
+{\footnotesize\ttfamily \label{main_8h_af1400ecc3800729ebaa40dc414c23aae} 
+double find\+Root (\begin{DoxyParamCaption}\item[{double}]{l}{, }\item[{double}]{r}{, }\item[{double \texorpdfstring{$\ast$}{*}}]{koefs}{, }\item[{int}]{max\+\_\+power}{}\end{DoxyParamCaption})}
+
+
+
+бинарный поиск корня 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\doxymbox{\texttt{in}}  & {\em l,r} & границы поиска \\
+\hline
+\doxymbox{\texttt{in}}  & {\em koefs} & коэффициенты уравнения \\
+\hline
+\doxymbox{\texttt{in}}  & {\em max\+\_\+power} & степень уравнения \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+корень 
+\end{DoxyReturn}
+\Hypertarget{main_8h_a02fc36ec31114fb6ced067af6642d8ae}\index{main.h@{main.h}!getKoefs@{getKoefs}}
+\index{getKoefs@{getKoefs}!main.h@{main.h}}
+\doxysubsubsection{\texorpdfstring{getKoefs()}{getKoefs()}}
+{\footnotesize\ttfamily \label{main_8h_a02fc36ec31114fb6ced067af6642d8ae} 
+int get\+Koefs (\begin{DoxyParamCaption}\item[{double}]{koefs}{\+[$\,$]}\end{DoxyParamCaption})}
+
+
+
+ввод уравнения с парсером 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\doxymbox{\texttt{out}}  & {\em koefs} & коэффициенты уравнения \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+степень многочлена 
+\end{DoxyReturn}
+\Hypertarget{main_8h_a714f3b66f7a2c32ae390d535bccedd01}\index{main.h@{main.h}!isEqualRoots@{isEqualRoots}}
+\index{isEqualRoots@{isEqualRoots}!main.h@{main.h}}
+\doxysubsubsection{\texorpdfstring{isEqualRoots()}{isEqualRoots()}}
+{\footnotesize\ttfamily \label{main_8h_a714f3b66f7a2c32ae390d535bccedd01} 
+bool is\+Equal\+Roots (\begin{DoxyParamCaption}\item[{double}]{a}{, }\item[{double}]{b}{}\end{DoxyParamCaption})}
+
+
+
+функция сравнения корней 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\doxymbox{\texttt{in}}  & {\em a} & первый корень \\
+\hline
+\doxymbox{\texttt{in}}  & {\em b} & второй корень \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+равны ли корни 
+\end{DoxyReturn}
+\Hypertarget{main_8h_a1d48a5c56ee7867f80f357c512bf674d}\index{main.h@{main.h}!isfiniteKoefs@{isfiniteKoefs}}
+\index{isfiniteKoefs@{isfiniteKoefs}!main.h@{main.h}}
+\doxysubsubsection{\texorpdfstring{isfiniteKoefs()}{isfiniteKoefs()}}
+{\footnotesize\ttfamily \label{main_8h_a1d48a5c56ee7867f80f357c512bf674d} 
+bool isfinite\+Koefs (\begin{DoxyParamCaption}\item[{double \texorpdfstring{$\ast$}{*}}]{koefs}{, }\item[{int}]{max\+\_\+power}{}\end{DoxyParamCaption})}
+
+
+
+проверка всех коэффициентов на isfinite 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\doxymbox{\texttt{in}}  & {\em koefs} & коэффициенты уравнения \\
+\hline
+\doxymbox{\texttt{in}}  & {\em max\+\_\+power} & степень уравнения \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+результат isfinite от всех корней 
+\end{DoxyReturn}
+\Hypertarget{main_8h_a51a4635a709cda1a7b03db3b8d4028ca}\index{main.h@{main.h}!parseKoefs@{parseKoefs}}
+\index{parseKoefs@{parseKoefs}!main.h@{main.h}}
+\doxysubsubsection{\texorpdfstring{parseKoefs()}{parseKoefs()}}
+{\footnotesize\ttfamily \label{main_8h_a51a4635a709cda1a7b03db3b8d4028ca} 
+int parse\+Koefs (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{s}{, }\item[{double}]{koefs}{\+[$\,$]}\end{DoxyParamCaption})}
+
+
+
+парсер коэффициентов из преобразованной строки 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\doxymbox{\texttt{in}}  & {\em s} & строка для обработки \\
+\hline
+\doxymbox{\texttt{out}}  & {\em koefs} & коэффициенты уравнения \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+степень многочлена 
+\end{DoxyReturn}
+\Hypertarget{main_8h_a6182486b29a05265e2fb9f0ca1d41076}\index{main.h@{main.h}!printSolves@{printSolves}}
+\index{printSolves@{printSolves}!main.h@{main.h}}
+\doxysubsubsection{\texorpdfstring{printSolves()}{printSolves()}}
+{\footnotesize\ttfamily \label{main_8h_a6182486b29a05265e2fb9f0ca1d41076} 
+void print\+Solves (\begin{DoxyParamCaption}\item[{int}]{k\+\_\+roots}{, }\item[{double \texorpdfstring{$\ast$}{*}}]{roots}{}\end{DoxyParamCaption})}
+
+
+
+вывод корней 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\doxymbox{\texttt{in}}  & {\em k\+\_\+roots} & количество решений \\
+\hline
+\doxymbox{\texttt{in}}  & {\em roots} & решения уравнения \\
+\hline
+\end{DoxyParams}
+\Hypertarget{main_8h_acffc16b4c90fec86ef50ec4b777f0999}\index{main.h@{main.h}!runUnittest@{runUnittest}}
+\index{runUnittest@{runUnittest}!main.h@{main.h}}
+\doxysubsubsection{\texorpdfstring{runUnittest()}{runUnittest()}}
+{\footnotesize\ttfamily \label{main_8h_acffc16b4c90fec86ef50ec4b777f0999} 
+bool run\+Unittest (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{structTestCase}{Test\+Case}}}]{test}{}\end{DoxyParamCaption})}
+
+
+
+запуск одного юнит теста 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\doxymbox{\texttt{in}}  & {\em test} & данные теста \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+пройден ли тест 
+\end{DoxyReturn}
+\Hypertarget{main_8h_a74b056662a101f15aea39bc05b2b6a2a}\index{main.h@{main.h}!solveLinear@{solveLinear}}
+\index{solveLinear@{solveLinear}!main.h@{main.h}}
+\doxysubsubsection{\texorpdfstring{solveLinear()}{solveLinear()}}
+{\footnotesize\ttfamily \label{main_8h_a74b056662a101f15aea39bc05b2b6a2a} 
+int solve\+Linear (\begin{DoxyParamCaption}\item[{double}]{k}{, }\item[{double}]{b}{, }\item[{double \texorpdfstring{$\ast$}{*}}]{x}{}\end{DoxyParamCaption})}
+
+
+
+решатель линейных уравнений 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\doxymbox{\texttt{in}}  & {\em k,b} & коэффициенты уравнения \\
+\hline
+\doxymbox{\texttt{out}}  & {\em x} & решение \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+количество решений 
+\end{DoxyReturn}
+\Hypertarget{main_8h_a98b778eefd5d84b5c6b0a60a5f910f5f}\index{main.h@{main.h}!solveReq@{solveReq}}
+\index{solveReq@{solveReq}!main.h@{main.h}}
+\doxysubsubsection{\texorpdfstring{solveReq()}{solveReq()}}
+{\footnotesize\ttfamily \label{main_8h_a98b778eefd5d84b5c6b0a60a5f910f5f} 
+int solve\+Req (\begin{DoxyParamCaption}\item[{double \texorpdfstring{$\ast$}{*}}]{koefs}{, }\item[{double \texorpdfstring{$\ast$}{*}}]{roots}{, }\item[{int}]{max\+\_\+power}{}\end{DoxyParamCaption})}
+
+
+
+решатель квадратного уравнения 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\doxymbox{\texttt{in}}  & {\em koefs} & коэффициенты уравнения \\
+\hline
+\doxymbox{\texttt{out}}  & {\em roots} & решения уравнения \\
+\hline
+\doxymbox{\texttt{in}}  & {\em max\+\_\+power} & степень уравнения \\
+\hline
+\end{DoxyParams}

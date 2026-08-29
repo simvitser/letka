@@ -111,132 +111,151 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('main_8h_source
   <div class="headertitle"><div class="title">main.h</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#ifndef _MAIN_H</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#define _MAIN_H</span></div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;stdbool.h&gt;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;stdint.h&gt;</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment">// #define quietColoredPrintf(color, smth) if (!GLOBAL_QUIET) coloredPrintf(color, smth)</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment">// #define quietPrintf(smth) if (!GLOBAL_QUIET) printf(smth)    // another version</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#define QUIET if (!GLOBAL_QUIET) </span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#define myassert(esp)                                                          \</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">    if (!(esp)) {                                                              \</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">        fprintf(stderr, &quot;ASSSSSERT: %s! line: %d, file: %s, func: %s\n&quot;, #esp, \</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">                __LINE__, __FILE__, __func__);                                 \</span></div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">        abort();                                                               \</span></div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">    }</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#define MAX_LEN 100 </span><span class="comment">// максимальная длина вводимого уравнения</span></div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#define SIZE_PLOT_Y 41 </span><span class="comment">// размер графика</span></div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#define SIZE_PLOT_X 121</span></div>
+<a href="main_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#ifndef _MAIN_H</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#define _MAIN_H</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;stdbool.h&gt;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;stdint.h&gt;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment">// #define quietColoredPrintf(color, smth) if (!GLOBAL_QUIET) coloredPrintf(color, smth)</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment">// #define quietPrintf(smth) if (!GLOBAL_QUIET) printf(smth)    // another version</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#define myassert(esp)                                                          \</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">    if (!(esp)) {                                                              \</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">        fprintf(stderr, &quot;ASSSSSERT: %s! line: %d, file: %s, func: %s\n&quot;, #esp, \</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">                __LINE__, __FILE__, __func__);                                 \</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">        abort();                                                               \</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">    }</span></div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="keyword">typedef</span> <span class="keyword">enum</span> {</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    ZERO_SOLVES,</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    ONE_SOLVE,</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    TWO_SOLVES,</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    INF_SOLVES</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>} KSolves;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">#define MAX_LEN 100 </span><span class="comment">// максимальная длина вводимого уравнения</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="preprocessor">#define MAX_POWER 20 </span><span class="comment">// максимальное количество слагаемых многочлена для ввода</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#define SIZE_PLOT_Y 41 </span><span class="comment">// размер графика</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#define SIZE_PLOT_X 121</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
-<div class="foldopen" id="foldopen00028" data-start="{" data-end="};">
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="structSquareKoefs.html">   28</a></span><span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    <span class="keywordtype">double</span> a, b, c;</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>} <a class="code hl_struct" href="structSquareKoefs.html">SquareKoefs</a>;</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="preprocessor">#define SIZE_GAME 6</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="preprocessor">#define K_TARGETS_GAME 3</span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="preprocessor">#define INF_SOLVES -1</span></div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="preprocessor">#define EPS_ROOT 1e-4 </span><span class="comment">// точность для сравнения решений</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="keywordtype">bool</span> isEqualRoots(<span class="keywordtype">double</span> a, <span class="keywordtype">double</span> b);</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span></div>
+<div class="foldopen" id="foldopen00045" data-start="{" data-end="};">
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno"><a class="line" href="structTestCase.html">   45</a></span><span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="keywordtype">double</span> *koefs;</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    <span class="keywordtype">int</span> max_power;</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    <span class="keywordtype">int</span> k_roots;</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    <span class="keywordtype">double</span> *roots;</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>} <a class="code hl_struct" href="structTestCase.html">TestCase</a>;</div>
 </div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
-<div class="foldopen" id="foldopen00032" data-start="{" data-end="};">
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="structTestCase.html">   32</a></span><span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <a class="code hl_struct" href="structSquareKoefs.html">SquareKoefs</a> koefs;</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    KSolves solution_type;</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="keywordtype">double</span> x1, x2;</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>} <a class="code hl_struct" href="structTestCase.html">TestCase</a>;</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span></div>
+<div class="foldopen" id="foldopen00055" data-start="{" data-end="};">
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno"><a class="line" href="structArgValues.html">   55</a></span><span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <span class="keyword">const</span> <span class="keywordtype">char</span>* filename;</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <span class="keywordtype">long</span> num_tests;</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>} <a class="code hl_struct" href="structArgValues.html">ArgValues</a>; </div>
 </div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
-<div class="foldopen" id="foldopen00038" data-start="{" data-end="};">
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="structArgValues.html">   38</a></span><span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    <span class="keyword">const</span> <span class="keywordtype">char</span>* filename;</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <span class="keywordtype">long</span> num_tests;</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    uint32_t seed;</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    uint64_t flags;</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>} <a class="code hl_struct" href="structArgValues.html">ArgValues</a>; <span class="comment">// структура для возвращаемых значений</span></div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span></div>
+<div class="foldopen" id="foldopen00063" data-start="{" data-end="};">
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno"><a class="line" href="structPoint.html">   63</a></span><span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    <span class="keywordtype">int</span> y, x;</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>} <a class="code hl_struct" href="structPoint.html">Point</a>;</div>
 </div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="keyword">enum</span> FLAG_BYTES {</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    FLAG_QUIET = (1U &lt;&lt; 0), </div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    FLAG_TYPEENTER = (1U &lt;&lt; 1), </div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    FLAG_RUNTEST = (1U &lt;&lt; 2), </div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    FLAG_DEBUGARGS = (1U &lt;&lt; 3), </div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    FLAG_DEBUGPARSE = (1U &lt;&lt; 4), </div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    FLAG_SIGNUP = (1U &lt;&lt; 5), </div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    FLAG_RUNRANDOMTEST = (1U &lt;&lt; 6),</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    FLAG_DRAWPLOT = (1U &lt;&lt; 7),</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    FLAG_DRAWPLOTOFFSET = (1U &lt;&lt; 8),</div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    FLAG_SETSEED = (1U &lt;&lt; 9),</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    FLAG_HELP = (1U &lt;&lt; 10)</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>};</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="keyword">enum</span> MAINERRORS {</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    MAINERRORS_FAILEDTESTS = 67,</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    MAINERRORS_FAILEDRANDOMTEST,</div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    MAINERRORS_FAILEDSIGNIN</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>};</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="comment">// Функция запуска юнит тестов</span></div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="keywordtype">void</span> runUnittests();</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="comment">// запуск одного юнит теста</span></div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="keywordtype">bool</span> runUnittest(<a class="code hl_struct" href="structTestCase.html">TestCase</a> test);</div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="comment">// запуск теста с проверкой постановкой</span></div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="keywordtype">bool</span> runTest(<a class="code hl_struct" href="structSquareKoefs.html">SquareKoefs</a> koefs);</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="comment">// юнит тесты из файла</span></div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="keywordtype">bool</span> runUnittestsFromFile(<span class="keyword">const</span> <span class="keywordtype">char</span> *filename);</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span></div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><span class="keywordtype">bool</span> getKoefsABC(<a class="code hl_struct" href="structSquareKoefs.html">SquareKoefs</a>* koefs);</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="comment">// ввод уравнения с парсером</span></div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><span class="keywordtype">bool</span> getKoefsParser(<a class="code hl_struct" href="structSquareKoefs.html">SquareKoefs</a> *koefs);</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span><span class="comment">// парсер коэффициентов из преобразованной строки</span></div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span><span class="keywordtype">bool</span> parseKoefs(<span class="keywordtype">char</span> *s, <a class="code hl_struct" href="structSquareKoefs.html">SquareKoefs</a> *koefs);</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span><span class="comment">// ввод коэффициентов, запускает getKoefsABC или getKoefsParser по флагу </span></div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span><span class="keywordtype">bool</span> getKoefs(<a class="code hl_struct" href="structSquareKoefs.html">SquareKoefs</a> *koefs, <span class="keywordtype">bool</span> typeenter);</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span> </div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span><span class="comment">// решатель квадратного уравнения</span></div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>KSolves solveLinear(<span class="keywordtype">double</span> k, <span class="keywordtype">double</span> b, <span class="keywordtype">double</span> *x);</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>KSolves solveSquare(<a class="code hl_struct" href="structSquareKoefs.html">SquareKoefs</a> koefs, <span class="keywordtype">double</span> *x1, <span class="keywordtype">double</span> *x2);</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="comment">// вывод корней</span></div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="keywordtype">void</span> printSolves(KSolves solution_type, <span class="keywordtype">double</span> x1, <span class="keywordtype">double</span> x2);</div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span> </div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><span class="comment">// расчет ax^2 + bx + c</span></div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span><span class="keywordtype">double</span> countEq(<a class="code hl_struct" href="structSquareKoefs.html">SquareKoefs</a> koefs, <span class="keywordtype">double</span> x);</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span> </div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><span class="comment">// запуск рандомных тестов</span></div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span><span class="keywordtype">bool</span> runRandomTest(<span class="keywordtype">long</span> num_tests);</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span> </div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span><span class="comment">// построение графика на основе scale</span></div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><span class="keywordtype">void</span> drawPlot(<a class="code hl_struct" href="structSquareKoefs.html">SquareKoefs</a> koefs);</div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span><span class="comment">// постороение графика на основе смещений</span></div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="keywordtype">void</span> drawPlotOffset(<a class="code hl_struct" href="structSquareKoefs.html">SquareKoefs</a> koefs);</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span></div>
+<div class="foldopen" id="foldopen00070" data-start="{" data-end="};">
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno"><a class="line" href="main_8h.html#ad82157a01d2d4e1639cc151c9e5459d0">   70</a></span><span class="keyword">enum</span> <a class="code hl_enumeration" href="main_8h.html#ad82157a01d2d4e1639cc151c9e5459d0">FLAG_BYTES</a> {</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    FLAG_QUIET = (1U &lt;&lt; 0), </div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    FLAG_TYPEENTER = (1U &lt;&lt; 1), </div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    FLAG_RUNTEST = (1U &lt;&lt; 2), </div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    FLAG_DEBUGARGS = (1U &lt;&lt; 3), </div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    FLAG_DEBUGPARSE = (1U &lt;&lt; 4), </div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    FLAG_SIGNUP = (1U &lt;&lt; 5), </div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    FLAG_RUNRANDOMTEST = (1U &lt;&lt; 6),</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    FLAG_DRAWPLOT = (1U &lt;&lt; 7),</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    FLAG_DRAWPLOTOFFSET = (1U &lt;&lt; 8),</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    FLAG_SETSEED = (1U &lt;&lt; 9),</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    FLAG_HELP = (1U &lt;&lt; 10),</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    FLAG_GAME = (1U &lt;&lt; 11),</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    FLAG_DEBUGREQ = (1U &lt;&lt; 12)</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>};</div>
+</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span></div>
+<div class="foldopen" id="foldopen00089" data-start="{" data-end="};">
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno"><a class="line" href="main_8h.html#a92f3116e4febbf8a8f2afa0344f4e379">   89</a></span><span class="keyword">enum</span> <a class="code hl_enumeration" href="main_8h.html#a92f3116e4febbf8a8f2afa0344f4e379">MAINERRORS</a> {</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    MAINERRORS_FAILEDTESTS = 67,</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    MAINERRORS_FAILEDRANDOMTEST,</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    MAINERRORS_FAILEDSIGNIN</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>};</div>
+</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span> </div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span><span class="comment">// Функция запуска юнит тестов</span></div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span><span class="comment">// void runUnittests();</span></div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span></div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="keywordtype">bool</span> runUnittest(<a class="code hl_struct" href="structTestCase.html">TestCase</a> test);</div>
 <div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span> </div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span><span class="comment">// получение правильного типа решения на основе вершины параболы</span></div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>KSolves getRightSolutionType(<a class="code hl_struct" href="structSquareKoefs.html">SquareKoefs</a> koefs);</div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span><span class="comment">// проверка правильности ответа подстановкой</span></div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span><span class="keywordtype">bool</span> checkTestAnswer(<a class="code hl_struct" href="structSquareKoefs.html">SquareKoefs</a> koefs, KSolves solution_type_ans, <span class="keywordtype">double</span> x1, <span class="keywordtype">double</span> x2);</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span><span class="comment">// запуск теста с проверкой постановкой</span></div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span><span class="comment">// bool runTest(double *koefs);</span></div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span><span class="comment">// юнит тесты из файла</span></div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span><span class="comment">// bool runUnittestsFromFile(const char *filename);</span></div>
 <div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span> </div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span><span class="comment">// функции для флагов</span></div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span><span class="keywordtype">void</span> setSeed(<span class="keyword">const</span> <span class="keywordtype">int</span> argc, <span class="keyword">const</span> <span class="keywordtype">char</span> *argv[], <span class="keywordtype">void</span> *arg_values);</div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span><span class="keywordtype">void</span> setTestFilename(<span class="keyword">const</span> <span class="keywordtype">int</span> argc, <span class="keyword">const</span> <span class="keywordtype">char</span> *argv[], <span class="keywordtype">void</span> *arg_values);</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span><span class="keywordtype">void</span> setNumTests(<span class="keyword">const</span> <span class="keywordtype">int</span> argc, <span class="keyword">const</span> <span class="keywordtype">char</span> *argv[], <span class="keywordtype">void</span> *arg_values);</div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span> </div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span><span class="preprocessor">#endif</span></div>
-<div class="ttc" id="astructArgValues_html"><div class="ttname"><a href="structArgValues.html">ArgValues</a></div><div class="ttdef"><b>Definition</b> main.h:38</div></div>
-<div class="ttc" id="astructSquareKoefs_html"><div class="ttname"><a href="structSquareKoefs.html">SquareKoefs</a></div><div class="ttdef"><b>Definition</b> main.h:28</div></div>
-<div class="ttc" id="astructTestCase_html"><div class="ttname"><a href="structTestCase.html">TestCase</a></div><div class="ttdef"><b>Definition</b> main.h:32</div></div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span></div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno"><a class="line" href="main_8h.html#a02fc36ec31114fb6ced067af6642d8ae">  116</a></span><span class="keywordtype">int</span> getKoefs(<span class="keywordtype">double</span> koefs[]);</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span></div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno"><a class="line" href="main_8h.html#a51a4635a709cda1a7b03db3b8d4028ca">  124</a></span><span class="keywordtype">int</span> parseKoefs(<span class="keywordtype">char</span> *s, <span class="keywordtype">double</span> koefs[]);</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span></div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span><span class="keywordtype">bool</span> isfiniteKoefs(<span class="keywordtype">double</span> *koefs, <span class="keywordtype">int</span> max_power);</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span></div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span><span class="keywordtype">int</span> solveLinear(<span class="keywordtype">double</span> k, <span class="keywordtype">double</span> b, <span class="keywordtype">double</span> *x);</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span></div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span><span class="keywordtype">int</span> solveReq(<span class="keywordtype">double</span> *koefs, <span class="keywordtype">double</span> *roots, <span class="keywordtype">int</span> max_power);</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span></div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span><span class="keywordtype">double</span> findRoot(<span class="keywordtype">double</span> l, <span class="keywordtype">double</span> r, <span class="keywordtype">double</span> *koefs, <span class="keywordtype">int</span> max_power);</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span></div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span><span class="keywordtype">void</span> printSolves(<span class="keywordtype">int</span> k_roots, <span class="keywordtype">double</span>* roots);</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span></div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span><span class="keywordtype">double</span> countEq(<span class="keywordtype">double</span> *koefs, <span class="keywordtype">int</span> max_power, <span class="keywordtype">double</span> x);</div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span> </div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span><span class="comment">// запуск рандомных тестов</span></div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span><span class="comment">bool runRandomTest(long num_tests);</span></div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span><span class="comment"></span> </div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span><span class="comment">// построение графика на основе scale</span></div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span><span class="comment">void drawPlot(double koefs);</span></div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span><span class="comment">// постороение графика на основе смещений</span></div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span><span class="comment">void drawPlotOffset(double koefs);</span></div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span><span class="comment"></span> </div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span><span class="comment">// получение правильного типа решения на основе вершины параболы</span></div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span><span class="comment">KSolves getRightSolutionType(double koefs);</span></div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span><span class="comment">// проверка правильности ответа подстановкой</span></div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span><span class="comment">bool checkTestAnswer(double koefs, KSolves solution_type_ans, double x1, double x2);</span></div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span><span class="comment">*/</span></div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span> </div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span><span class="comment">// функции для флагов</span></div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span><span class="keywordtype">void</span> setSeed(<span class="keyword">const</span> <span class="keywordtype">int</span> argc, <span class="keyword">const</span> <span class="keywordtype">char</span> *argv[], <span class="keywordtype">void</span> *arg_values);</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span><span class="keywordtype">void</span> setTestFilename(<span class="keyword">const</span> <span class="keywordtype">int</span> argc, <span class="keyword">const</span> <span class="keywordtype">char</span> *argv[], <span class="keywordtype">void</span> *arg_values);</div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span><span class="keywordtype">void</span> setNumTests(<span class="keyword">const</span> <span class="keywordtype">int</span> argc, <span class="keyword">const</span> <span class="keywordtype">char</span> *argv[], <span class="keywordtype">void</span> *arg_values);</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span> </div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span><span class="comment">// функция вывода поля на экран</span></div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span><span class="comment">// void printFeel(char feel[SIZE_GAME][SIZE_GAME]);</span></div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span> </div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span><span class="comment">// функция запуска игры</span></div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span><span class="comment">// void startGame();</span></div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span> </div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span><span class="preprocessor">#endif</span></div>
+<div class="ttc" id="amain_8h_html_a92f3116e4febbf8a8f2afa0344f4e379"><div class="ttname"><a href="main_8h.html#a92f3116e4febbf8a8f2afa0344f4e379">MAINERRORS</a></div><div class="ttdeci">MAINERRORS</div><div class="ttdoc">ошибки фунции main</div><div class="ttdef"><b>Definition</b> main.h:89</div></div>
+<div class="ttc" id="amain_8h_html_ad82157a01d2d4e1639cc151c9e5459d0"><div class="ttname"><a href="main_8h.html#ad82157a01d2d4e1639cc151c9e5459d0">FLAG_BYTES</a></div><div class="ttdeci">FLAG_BYTES</div><div class="ttdoc">битовые маски флагов парсера аргументов</div><div class="ttdef"><b>Definition</b> main.h:70</div></div>
+<div class="ttc" id="astructArgValues_html"><div class="ttname"><a href="structArgValues.html">ArgValues</a></div><div class="ttdoc">структура для возвращаемых значений</div><div class="ttdef"><b>Definition</b> main.h:55</div></div>
+<div class="ttc" id="astructPoint_html"><div class="ttname"><a href="structPoint.html">Point</a></div><div class="ttdoc">структура точки для игры</div><div class="ttdef"><b>Definition</b> main.h:63</div></div>
+<div class="ttc" id="astructTestCase_html"><div class="ttname"><a href="structTestCase.html">TestCase</a></div><div class="ttdoc">структура для тестов</div><div class="ttdef"><b>Definition</b> main.h:45</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 </div><!-- container -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><b>main.h</b></li>
+    <li class="navelem"><a href="main_8h.html">main.h</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.18.0 </li>
   </ul>
 </div>

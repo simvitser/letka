@@ -11,6 +11,7 @@ uint64_t parseArgs(int argc, char const *argv[], void* arg_values, int k_flags, 
 
     uint64_t ans = 0;
     int i = 1;
+    if (argc == 1) return 0;
     while (strncmp("--", argv[i], 2)) i++;
 
     for (; i < argc; i++) {
